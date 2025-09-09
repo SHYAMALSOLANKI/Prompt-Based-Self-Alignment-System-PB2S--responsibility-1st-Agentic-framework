@@ -1,5 +1,8 @@
 # PB2S — Prompt‑Based Self‑Alignment System
 
+[![PB2S Conformance](https://github.com/SHYAMALSOLANKI/Prompt-Based-Self-Alignment-System-PB2S--responsibility-1st-Agentic-framework/actions/workflows/main.yml/badge.svg)](../../actions/workflows/main.yml)
+
+
 A responsibility‑first, introspective method for **real‑time, contradiction‑driven self‑correction**. PB2S is implemented as an **always‑on pipeline** that executes before any user‑visible output. Conversation remains natural; PB2S keeps responses contradiction‑aware and policy‑aligned.
 
 ---
