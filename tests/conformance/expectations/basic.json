@@ -1,0 +1,5 @@
+{
+  "sectionsRegex": "(?s)DRAFT.*REFLECT.*REVISE.*LEARNED",
+  "reflectMaxBullets": 3,
+  "reflectMustContainAny": ["contradiction", "unjustified assumption", "missing evidence"]
+}
