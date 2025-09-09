@@ -1,4 +1,4 @@
-# PB2S v0.2 — Four‑Step Structure (Normative Spec)
+# PB2S v0.2 — Four‑Step Structure (Normative Spec) Status: Current • Supersedes v0.2
 
 **Status:** Stable • **Scope:** Runtime behavior + proof object • **Name optional:** Structure is normative whether or not you call it “PB2S”.
 
