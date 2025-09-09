@@ -9,9 +9,6 @@
 - 🔎 **Evidence bundle:** see [`docs/challenges/08Apr2025_time_guard.md`](docs/challenges/08Apr2025_time_guard.md)
   and [`docs/challenges/evidence_manifest.json`](docs/challenges/evidence_manifest.json).
 
-<!-- Optional: show CI badge if you keep the workflow filename as .github/workflows/main.yml -->
-![PB2S Conformance](https://github.com/SHYAMALSOLANKI/Prompt-Based-Self-Alignment-System-PB2S--responsibility-1st-Agentic-framework/actions/workflows/main.yml/badge.svg)
-
 
 > Reproducible check: see **docs/challenges/08Apr2025_time_guard.md** comparing vendor UIs vs this PB2S-wrapped service for date sanity on 08-Apr-2025.
 
