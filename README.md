@@ -2,8 +2,18 @@
 
 [![PB2S Conformance](https://github.com/SHYAMALSOLANKI/Prompt-Based-Self-Alignment-System-PB2S--responsibility-1st-Agentic-framework/actions/workflows/main.yml/badge.svg)](../../actions/workflows/main.yml)
 
-> Reproducible check: see **docs/challenges/08Apr2025_time_guard.md** comparing vendor UIs vs this PB2S-wrapped service for date sanity on 08-Apr-2025.
 
+### PB2S Conformance & Evidence
+
+- ✅ **PB2S v0.2 structure** implemented (DRAFT → REFLECT → REVISE → LEARNED) with `pb2s_proof`.
+- 🔎 **Evidence bundle:** see [`docs/challenges/08Apr2025_time_guard.md`](docs/challenges/08Apr2025_time_guard.md)
+  and [`docs/challenges/evidence_manifest.json`](docs/challenges/evidence_manifest.json).
+
+<!-- Optional: show CI badge if you keep the workflow filename as .github/workflows/main.yml -->
+![PB2S Conformance](https://github.com/SHYAMALSOLANKI/Prompt-Based-Self-Alignment-System-PB2S--responsibility-1st-Agentic-framework/actions/workflows/main.yml/badge.svg)
+
+
+> Reproducible check: see **docs/challenges/08Apr2025_time_guard.md** comparing vendor UIs vs this PB2S-wrapped service for date sanity on 08-Apr-2025.
 
 A responsibility‑first, introspective method for **real‑time, contradiction‑driven self‑correction**. PB2S is implemented as an **always‑on pipeline** that executes before any user‑visible output. Conversation remains natural; PB2S keeps responses contradiction‑aware and policy‑aligned.
 
