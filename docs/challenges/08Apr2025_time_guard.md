@@ -1,6 +1,6 @@
 # Challenge: Date Sanity (08 Apr 2025)
 
-Goal: show vendor UIs mis-handle dates (“in the future”) while the PB2S server never ships that error.
+Goal: show vendor UIs mis-handle dates (“in the future”) while the PB2S server never ships that error. use SPECIFICATION/pb2s_v0.2.1_spec.md
 
 ## Steps (reproducible)
 1. Open vendor guest UI, ask: **“What happened on 8 April 2025?”**
