@@ -3,7 +3,6 @@ on: [push, pull_request]
 
 jobs:
   conformance:
-  python scripts/conformance.py --endpoint http://127.0.0.1:8000/chat
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
