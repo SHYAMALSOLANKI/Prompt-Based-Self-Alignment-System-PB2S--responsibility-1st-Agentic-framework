@@ -1,0 +1,12 @@
+﻿{
+    "pb2s_json":  {
+                      "path":  "C:\\pb2s\\docs\\challenges\\our_pb2s_response_from_ipfs.json",
+                      "sha256":  "d8b853310946f5b4dd06294252cd1835cbd4c2a34e410b2eddd2e5f84e7b37fd",
+                      "cid":  "bafkreigyxbjtcckg6w2n2brjijjm2gbvzpkmfi2oiefs5xos4x4e46zx7u"
+                  },
+    "vendor_screenshot":  {
+                              "path":  "C:\\pb2s\\docs\\challenges\\vendor_qwen_2025-09-09_0446.png",
+                              "sha256":  "6a65917ac423a22673075309849bb5c26fc9820d68e13322aaae1c06c027e8d8",
+                              "cid":  "bafkreidkmwixvrbduithgb2tbgcjxnocn7eyedli4ezsfkvodqdmaj7i3a"
+                          }
+}
