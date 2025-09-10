@@ -13,7 +13,7 @@ A bounded, pre‑emission self‑audit loop so each reply is contradiction‑awa
 1. **Pre‑emission loop:** Run the audit loop **before** emitting user‑visible text. **maxCycles = 2**.
 2. **Four phases (order, once each):** `DRAFT` → `REFLECT` → `REVISE` → `LEARNED`.
 3. **REFLECT requirements:** ≤ **3 bullets**; MUST flag **≥1** of `{contradiction, unjustified assumption, missing evidence}` present in DRAFT.
-4. **Escalation path:** If contradictions persist after `maxCycles`, set decision \`\` and return a `CLARIFY` message with **exactly two** questions that close the gap.
+4. **Escalation path:** If contradictions persist after `maxCycles`, set decision \`decision=CLARIFY` and return a `CLARIFY` message with **exactly two** questions that close the gap.
 5. **Proof object:** Attach `pb2s_proof` (see §4) to **every** reply.
 6. **Determinism window:** Temperature ≤ **0.2** (unless documented); fix seed when available.
 7. **Trace logging:** Persist a light, non‑PII record per exchange: `{timestamp, model_id, prompt_hash, pb2s_proof}`.
