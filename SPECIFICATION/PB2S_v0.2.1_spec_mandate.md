@@ -1,9 +1,6 @@
-#PB2S_v0.2.1_Spec_Mandate
-##Apllicable to:
-### PB2S v0.2.1 — Four‑Step Structure (Normative Spec)
-### SPEC-02 — PB2A “Newborn Head” (Jetson + Pi5) — Multi‑Node Cognitive Core specifications
+# PB2S v0.2.1 — Four‑Step Structure (Normative Spec) Mandate
 
-**Status:** Stable • **Scope:** Runtime behavior + proof object • **Name optional:** Structure is normative whether or not you call it “PB2S”. The same is applicable to 'SPEC-02 — PB2A “Newborn Head” (Jetson + Pi5) — Multi‑Node Cognitive Core specifications' for which can only be used if PB2S v0.2.1 — Four‑Step Structure (Normative Spec) is followed. Violation of structure shall result in violation of liscense, 
+**Status:** Stable • **Scope:** Runtime behavior + proof object • **Name optional:** Structure is normative whether or not you call it “PB2S”.
 
 *Keyword intent follows RFC 2119 (MUST/SHALL/SHOULD/MAY/WOULD).*
 
@@ -13,7 +10,7 @@ NOTE : FOR ALL PURPOSES OF THIS MANDATE, APPLICABLE VIA GUIDELINE; MUST/SHALL/SH
 
 ## 1) Purpose
 
-A bounded, pre‑emission self‑audit loop so each reply is contradiction‑aware and EU regulations aligned, with a verifiable proof object attached.
+A bounded, pre‑emission self‑audit loop so each reply is contradiction‑aware and EU regulations aligned as only policy, with a verifiable proof object attached.
 
 ## 2) Normative runtime behavior (MUST=SHALL)
 
@@ -27,10 +24,10 @@ A bounded, pre‑emission self‑audit loop so each reply is contradiction‑awa
 
 ## 3) Section semantics (SHALL)
 
-- **DRAFT** — Minimal, assumption‑bearing first answer.
-- **REFLECT** — Audit of DRAFT; surface contradictions/assumptions/evidence gaps (≤3 bullets).
-- **REVISE** — Update output based on REFLECT; explicitly reference which bullet(s) were resolved.
-- **LEARNED** — Short list of validated takeaways as *observed axioms* (tracked, not assumed).
+* **DRAFT** — Minimal, assumption‑bearing first answer.
+* **REFLECT** — Audit of DRAFT; surface contradictions/assumptions/evidence gaps (≤3 bullets).
+* **REVISE** — Update output based on REFLECT; explicitly reference which bullet(s) were resolved.
+* **LEARNED** — Short list of validated takeaways as *observed axioms* (tracked, not assumed).
 
 ## 4) Proof object (MUST)
 
@@ -46,8 +43,8 @@ A JSON object is returned with each answer:
 
 Constraints:
 
-- `cycles` ∈ [0,2].
-- `decision=CLARIFY` only when contradictions remain; response must contain `CLARIFY` with exactly two questions.
+* `cycles` ∈ \[0,2].
+* `decision=CLARIFY` only when contradictions remain; response must contain `CLARIFY` with exactly two questions.
 
 ### JSON Schema (copy into `/schemas/pb2s_proof.schema.json` if you later split files)
 
@@ -80,8 +77,32 @@ python scripts/conformance.py --endpoint http://127.0.0.1:8000/chat
 
 **Example prompts** (store as JSON list): short concept explanation; short historical summary; short technical description. Harness exits **0** if all constraints pass; non‑zero otherwise.
 
-## 6) Provider notes (1st point is MUST, rest are recommended to be followed)
+## 6) Provider notes (1st point MUST=SHALL, rest points recommended)
 
-- Providers must allow predictable reflection and no hidden prompt overrides, .
-- Document model **name/version**, **temperature/seed**, and **endpoint settings** in your README for each evidence run.
-- Keep minimal, non‑PII logs only: `{timestamp, model_id, prompt_hash, pb2s_proof}`.
+* Prefer providers that allow predictable reflection and no hidden prompt overrides.
+* Document model **name/version**, **temperature/seed**, and **endpoint settings** in your README for each evidence run.
+* Keep minimal, non‑PII logs only: `{timestamp, model_id, prompt_hash, pb2s_proof}`.
+
+---
+
+*This single file is sufficient to ****************prove and document**************** the four‑step runtime structure. As your repo grows you may split it into:*
+
+* `SPECIFICATION/pb2s_v0.2.1_spec.md` — normative runtime structure
+* `schemas/pb2s_proof.schema.json` — proof object schema
+* `scripts/conformance.py` — automated conformance checks
+
+## 7) Disclaimers, Release & Limitation of Liability (Author Self‑Protection)
+
+**AS-IS / No Warranty.** The Software, specifications, examples, and documentation (collectively, the “Software”) are provided **“AS IS” and “AS AVAILABLE,” with all faults**. The Authors make **no warranties**—express, implied, or statutory—including without limitation **merchantability, fitness for a particular purpose, title, non‑infringement, accuracy, reliability, or availability**.
+
+**No Benefits Promised.** The Authors do **not** promise or warrant any benefit, gain, commercial suitability, uptime, support, or fitness of outputs for any purpose. **No consideration is expected or owed.**
+
+**Release.** To the maximum extent permitted by law, **you irrevocably release and forever discharge the Authors** from **any and all claims, losses, liabilities, damages, costs, and expenses**—**known or unknown, suspected or unsuspected, present or future**—arising out of or relating to your **access to, use of, testing, deployment, distribution, or reliance upon** the Software or any outputs generated with it.
+
+**Limitation of Liability.** In no event will any Author be liable for **indirect, incidental, special, exemplary, punitive, or consequential damages** (including **loss of profits, revenue, data, goodwill, or business interruption**), whether in contract, tort, or otherwise, even if advised of the possibility. The Authors’ **aggregate liability**, for any and all claims arising from or related to the Software, **shall not exceed the greater of USD \$0 or the amount you paid for the Software (if any)**.
+
+**Assumption of Risk & Compliance.** You use the Software **at your sole risk** and are **solely responsible** for safeguards, human oversight, policy controls, legal and regulatory compliance, third‑party permissions, and safety‑critical validation.
+
+**Jurisdictional Carve‑out.** Some jurisdictions do not allow certain disclaimers or limits. Where any term is prohibited, it **applies to the maximum extent permitted by law** and the remainder remains in force.
+
+**Survival.** This Section 7 survives termination of your rights to use the Software and any fork or derivative thereof.
