@@ -5,7 +5,7 @@
 
 ### PB2S Conformance & Evidence
 
-- ✅ **PB2S v0.2.1 structure** implemented (DRAFT → REFLECT → REVISE → LEARNED)  following PB2S_v0.2.1_spec_mandate.md with `pb2s_proof`.
+- ✅ **PB2S v0.2.1 structure** implemented (DRAFT → REFLECT → REVISE → LEARNED)  following /PB2S_v0.2.1_spec_mandate.md with `pb2s_proof`.
 - 🔎 **Evidence bundle:** see [`docs/challenges/08Apr2025_time_guard.md`](docs/challenges/08Apr2025_time_guard.md)
   and [`docs/challenges/evidence_manifest.json`](docs/challenges/evidence_manifest.json).
 - ✅ **Pb2s_multi_model_brain_v0.2.1_spec.md** for multimodel training or single model multi-point training; complete structure is essential to follow . 
