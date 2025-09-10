@@ -1,4 +1,4 @@
-# SPEC-02 — PB2A “Newborn Head” (Jetson + Pi5) — Multi‑Node Cognitive Core
+# SPEC-02 — PB2A “Newborn Head” (Jetson + Pi5) — Multi‑Node Cognitive Core; based on PB2S v0.2.1 — Four‑Step Structure (Normative Spec)
 
 ## Background
 
