@@ -73,9 +73,9 @@ python scripts/conformance.py --endpoint http://127.0.0.1:8000/chat
 
 **Example prompts** (store as JSON list): short concept explanation; short historical summary; short technical description. Harness exits **0** if all constraints pass; non‑zero otherwise.
 
-## 6) Provider notes (RECOMMENDED)
+## 6) Provider notes (fOLLOW MANDATE)
 
-Prefer providers that allow predictable reflection and no hidden prompt overrides. Document model/version/settings in your README. (RECOMMENDED) Prefer providers that allow predictable reflection and no hidden prompt overrides. Document model/version/settings in your README.
+
 
 ---
 
