@@ -59,7 +59,7 @@ Each interaction runs a bounded loop before returning text:
 3. **REVISE** — Update output based on the audit (fresh evidence > prior).
 4. **LEARNED** — Integrate validated updates as *observed axioms* (tracked, not assumed).
 
-See the normative spec: [Four-Step Structure v0.2.1](/SPECIFICATION/pb2s_v0.2_spec.md)
+See the normative spec: [Four-Step Structure v0.2.1](/SPECIFICATION/pb2s_v0.2.1_spec.md)
 
 **Escalation:** Up to **2 cycles**. If contradictions persist, return **CLARIFY** with **exactly two** questions that would close the gap.
 
