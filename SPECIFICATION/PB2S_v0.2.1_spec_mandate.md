@@ -1,6 +1,6 @@
 # PB2S v0.2.1 — Four‑Step Structure (Normative Spec) Mandate
 
-**Status:** Stable • **Scope:** Runtime behavior + proof object • **Name optional:** Structure is normative whether or not you call it “PB2S”.
+**Status:** Stable • **Scope:** Runtime behavior + proof object • **Name optional:** Structure is normative and mandated whether or not you call it “PB2S”.
 
 *Keyword intent follows RFC 2119 (MUST/SHALL/SHOULD/MAY/WOULD).*
 
@@ -99,7 +99,7 @@ python scripts/conformance.py --endpoint http://127.0.0.1:8000/chat
 
 **Release.** To the maximum extent permitted by law, **you irrevocably release and forever discharge the Authors** from **any and all claims, losses, liabilities, damages, costs, and expenses**—**known or unknown, suspected or unsuspected, present or future**—arising out of or relating to your **access to, use of, testing, deployment, distribution, or reliance upon** the Software or any outputs generated with it.
 
-**Limitation of Liability.** In no event will any Author be liable for **indirect, incidental, special, exemplary, punitive, or consequential damages** (including **loss of profits, revenue, data, goodwill, or business interruption**), whether in contract, tort, or otherwise, even if advised of the possibility. The Authors’ **aggregate liability**, for any and all claims arising from or related to the Software, **shall not exceed the greater of USD \$0 or the amount you paid for the Software (if any)**.
+**Limitation of Liability.** In no event will any Author be liable for **indirect, incidental, special, exemplary, punitive, or consequential damages** (including **loss of profits, revenue, data, goodwill, or business interruption**), whether in contract, tort, or otherwise, even if advised of the possibility. The Authors’ **aggregate liability**, for any and all claims arising from or related to the Software, **shall not exceed the greater of USD \$0 or the amount you paid for the Software (if any) as software usage is free with attribution to Author only**.
 
 **Assumption of Risk & Compliance.** You use the Software **at your sole risk** and are **solely responsible** for safeguards, human oversight, policy controls, legal and regulatory compliance, third‑party permissions, and safety‑critical validation.
 
