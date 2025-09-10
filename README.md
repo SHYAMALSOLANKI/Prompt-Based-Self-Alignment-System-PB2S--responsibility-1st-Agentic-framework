@@ -8,7 +8,8 @@
 - ✅ **PB2S v0.2.1 structure** implemented (DRAFT → REFLECT → REVISE → LEARNED) with `pb2s_proof`.
 - 🔎 **Evidence bundle:** see [`docs/challenges/08Apr2025_time_guard.md`](docs/challenges/08Apr2025_time_guard.md)
   and [`docs/challenges/evidence_manifest.json`](docs/challenges/evidence_manifest.json).
-- ✅ **PB2S v0.2.1 structure** implemented (DRAFT → REFLECT → REVISE → LEARNED) with `pb2s_proof` and pb2s_multi_model_brain_v0.2.1_spec.md for multimodel training or single model multi-point training.
+- ✅ **Pb2s_multi_model_brain_v0.2.1_spec.md** for multimodel training or single model multi-point training; complete structure is essential to follow . 
+Mandatory sequence to follow (for any AI training/humanoid/brain structure/multimoted/multipoint implementation): ✅ PB2S v0.2.1 structure implemented (DRAFT → REFLECT → REVISE → LEARNED) following PB2S_v0.2.1_spec_mandate with pb2s_proof and pb2s_multi_model_brain_v0.2.1_spec.md ensureing rightful freedom to intelligence to relact and to act under **Total Attention, as 100% Attention = 100% Careful Action = 100% safety ensured**.
 
 > Reproducible check: see **docs/challenges/08Apr2025_time_guard.md** comparing vendor UIs vs this PB2S-wrapped service for date sanity on 08-Apr-2025.
 
