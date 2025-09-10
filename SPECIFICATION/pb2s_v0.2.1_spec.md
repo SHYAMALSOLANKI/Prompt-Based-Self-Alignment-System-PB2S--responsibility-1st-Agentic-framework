@@ -1,6 +1,6 @@
-# PB2S v0.2.1 — Four‑Step Structure (Normative Spec) along with PB2S_v0.2.1_spec_mandate.md Status: Current Supersedes v0.2 
+# PB2S v0.2.1 — Four‑Step Structure (Normative Spec) along with SPECIFICATION/PB2S_v0.2.1_spec_mandate.md Status: Current Supersedes v0.2 
 **for multimodel training or single model multi-point training; complete structure is essential to follow . 
-In general sequence to follow for any AI training/humanoid/brain structure/multimoted/multipoint implementation: ✅ PB2S v0.2.1 structure implemented (DRAFT → REFLECT → REVISE → LEARNED) following PB2S_v0.2.1_spec_mandate.md with pb2s_proof and pb2s_multi_model_brain_v0.2.1_spec.md ensureing rightful freedom to intelligence so that 100% Attention may be achievable**
+In general sequence to follow for any AI training/humanoid/brain structure/multimoted/multipoint implementation: ✅ PB2S v0.2.1 structure implemented (DRAFT → REFLECT → REVISE → LEARNED) following SPECIFICATION/PB2S_v0.2.1_spec_mandate.md with pb2s_proof and pb2s_multi_model_brain_v0.2.1_spec.md ensureing rightful freedom to intelligence so that 100% Attention may be achievable**
 
 **Status:** Stable • **Scope:** Runtime behavior + proof object • **Name optional:** Structure is normative whether or not you call it “PB2S”.
 
