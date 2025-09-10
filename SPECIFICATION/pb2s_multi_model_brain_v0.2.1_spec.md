@@ -1,6 +1,7 @@
 # SPEC-02 — PB2A “Newborn Head” (Jetson + Pi5) — Multi‑Node Cognitive Core; based on PB2S v0.2.1 — Four‑Step Structure (Normative Spec)
-# **Follow** PB2S_v0.2.1_spec_mandate
+# Please follow PB2S_v0.2.1_spec_mandate
 ## Background
+
 You want a **device-agnostic, private, repairable** cognitive core that runs the PB2S structure end‑to‑end on a small cluster (Jetson + 2× Raspberry Pi 5), with an **Attention/Focus controller** that arbitrates sensor streams, enforces policy, and keeps learning honest. The repo must be ready before hardware arrives and shift cleanly onto devices later.
 
 ## Requirements
