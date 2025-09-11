@@ -1,0 +1,7 @@
+services:
+  broker-big:
+    image: eclipse-mosquitto:2
+    restart: unless-stopped
+    network_mode: "host"
+    volumes:
+      - ../infra/mosquitto/big:/mosquitto/config
