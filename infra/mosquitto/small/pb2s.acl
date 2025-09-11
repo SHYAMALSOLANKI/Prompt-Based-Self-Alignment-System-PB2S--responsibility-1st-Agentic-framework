@@ -1,0 +1,7 @@
+# PB2S MQTT ACL
+# Deny publishing to raw/*
+topic deny write raw/#
+# Allow publishing to sym/*
+topic write sym/#
+# Allow subscribing to all topics (for now)
+topic read #

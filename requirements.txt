@@ -1,3 +1,5 @@
+# For MQTT acceptance tests
+paho-mqtt
 fastapi
 uvicorn
 pydantic

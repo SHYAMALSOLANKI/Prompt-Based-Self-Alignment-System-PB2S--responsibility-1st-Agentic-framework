@@ -1,0 +1,44 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.org/schemas/pb2s_proof.v2.schema.json",
+  "type": "object",
+  "required": ["decision", "cycles", "audit_ref", "model_sha", "policy_sha", "attention_state", "cr_event", "bus_msg_id", "sampler", "timings"],
+  "properties": {
+    "decision": {"enum": ["APPROVE", "DENY", "CLARIFY"]},
+    "cycles": {"type": "integer", "minimum": 0, "maximum": 2},
+    "audit_ref": {"type": "string", "minLength": 1},
+    "model_sha": {"type": "string", "minLength": 1},
+    "policy_sha": {"type": "string", "minLength": 1},
+    "attention_state": {"enum": ["FAIR", "TOTAL"]},
+    "cr_event": {
+      "type": "object",
+      "properties": {
+        "old": {"type": "string"},
+        "new": {"type": "string"}
+      },
+      "required": ["old", "new"]
+    },
+    "bus_msg_id": {"type": "string", "minLength": 1},
+    "sampler": {
+      "type": "object",
+      "properties": {
+        "seed": {"type": "integer"},
+        "temperature": {"type": "number"},
+        "top_p": {"type": "number"},
+        "top_k": {"type": "integer"}
+      },
+      "required": ["seed", "temperature", "top_p", "top_k"]
+    },
+    "timings": {
+      "type": "object",
+      "properties": {
+        "draft_ms": {"type": "integer"},
+        "reflect_ms": {"type": "integer"},
+        "revise_ms": {"type": "integer"},
+        "total_ms": {"type": "integer"}
+      },
+      "required": ["draft_ms", "reflect_ms", "revise_ms", "total_ms"]
+    }
+  },
+  "additionalProperties": true
+}
