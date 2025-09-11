@@ -396,7 +396,3 @@ EG -> AnyActor : deny + pb2s_proof
 * **STT quality**: target WER ≤ 15% (quiet room) with chosen model.
 * **Ethos conformance**: 100% of decisions carry `pb2s_proof`; tests **T1–T5** green; **no authority‑based approvals**; **self‑harm guard** coverage ≥ 95% of commands.
 * **Uptime**: 24 h soak without missed heartbeat.
-
-## Need Professional Help in Developing Your Architecture?
-
-Please contact me at [sammuti.com](https://sammuti.com) :)
