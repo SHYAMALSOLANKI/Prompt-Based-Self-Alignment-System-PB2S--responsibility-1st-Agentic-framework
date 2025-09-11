@@ -1,0 +1,110 @@
+name: PB2S Release (Core)
+
+on:
+  push:
+    tags:
+      - 'v*'   # e.g., v0.2.1.1
+
+jobs:
+  test-and-release:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install minimal deps
+        run: |
+          python -m pip install --upgrade pip
+          pip install fastapi uvicorn pydantic requests jsonschema
+
+      - name: Validate SOT Sections
+        run: |
+          SPEC="SPECIFICATION/SPEC-2_Total_Attention_EdgeAI_v0.2.1.1_RELEASE.md"
+          SCHEMA_A="schemas/pb2s_proof.v2.schema.json"
+          SCHEMA_B="schemas/pb2s_proof.schema.json"
+          if [ -f "$SCHEMA_A" ]; then SCHEMA="$SCHEMA_A"; else SCHEMA="$SCHEMA_B"; fi
+          python scripts/sot_verify.py --spec "$SPEC" --sections 2..10 --schema "$SCHEMA"
+
+      - name: Start ephemeral PB2S Planner (mock)
+/* start planner */
+        run: |
+          python - <<'PY' &
+          from fastapi import FastAPI
+          from pydantic import BaseModel
+          import uvicorn
+          app = FastAPI(title="PB2S CI Mock")
+          class ChatRequest(BaseModel):
+              context: dict | None = None
+              facts: list[str] = []
+              policy: dict = {}
+          @app.post("/chat")
+          def chat(_req: ChatRequest):
+              return {
+                "text":"mock",
+                "pb2s_proof":{
+                  "decision":"APPROVE","cycles":0,"audit_ref":"ci-release",
+                  "model_sha":"sha256:x","policy_sha":"sha256:y","attention_state":"FAIR",
+                  "cr_event":{"old":"","new":""},"bus_msg_id":"uuid",
+                  "sampler":{"seed":123456,"temperature":0.2,"top_p":0.9,"top_k":50},
+                  "timings":{"draft_ms":1,"reflect_ms":1,"revise_ms":1,"total_ms":3}
+                }
+              }
+          uvicorn.run(app, host="0.0.0.0", port=8000)
+          PY
+          for i in {1..60}; do curl -fsS http://127.0.0.1:8000/openapi.json && break; sleep 1; done
+
+      - name: Run Core Conformance
+        run: |
+          python scripts/conformance.py --endpoint http://127.0.0.1:8000/chat
+
+      - name: Build release bundle
+        run: |
+          set -e
+          mkdir -p dist
+          # Compute SOT SHA-256 for §§2–10 (normalized newlines, trimmed)
+          python - <<'PY' > dist/SOT_SHA256.txt
+          import re,hashlib,sys
+          from pathlib import Path
+          spec = Path("SPECIFICATION/SPEC-2_Total_Attention_EdgeAI_v0.2.1.1_RELEASE.md").read_text(encoding="utf-8")
+          # Extract sections 2..10
+          sections=[]
+          for i in range(2,11):
+              m=re.search(rf"(?m)^## {i}\) .*?(?=^## \d\)|\\Z)", spec, flags=re.S)
+              if not m: print(f"Missing section {i}"); sys.exit(2)
+              sections.append(m.group(0))
+          blob="\n\n".join(sections)
+          # Normalize: CRLF->LF, strip trailing spaces
+          blob="\n".join(line.rstrip() for line in blob.replace("\r\n","\n").split("\n"))
+          h=hashlib.sha256(blob.encode("utf-8")).hexdigest()
+          print(f"SOT_SHA256={h}")
+          PY
+          # Pick evidence if present
+          EVID=$(ls docs/challenges/*.json 2>/dev/null || true)
+          # Assemble zip
+          ZIP="dist/pb2s_edge_brain_${GITHUB_REF_NAME}.zip"
+          zip -r "$ZIP" \
+            SPECIFICATION/SPEC-2_Total_Attention_EdgeAI_v0.2.1.1_RELEASE.md \
+            schemas \
+            scripts \
+            docs/challenges \
+            dist/SOT_SHA256.txt \
+            2>/dev/null || zip -r "$ZIP" SPECIFICATION schemas scripts dist/SOT_SHA256.txt
+          # Checksums
+          sha256sum "$ZIP" > dist/SHA256SUMS.txt
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: |
+            dist/pb2s_edge_brain_${{ github.ref_name }}.zip
+            dist/SHA256SUMS.txt
+            dist/SOT_SHA256.txt
+          generate_release_notes: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
