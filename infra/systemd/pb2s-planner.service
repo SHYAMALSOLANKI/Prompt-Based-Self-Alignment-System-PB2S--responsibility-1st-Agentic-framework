@@ -1,0 +1,11 @@
+[Unit]
+Description=PB2S Planner
+After=network-online.target
+[Service]
+Environment=PYTHONUNBUFFERED=1
+WorkingDirectory=/opt/pb2s
+ExecStart=/usr/bin/python3 -m uvicorn main:app --host 0.0.0.0 --port 8000
+Restart=always
+RestartSec=2
+[Install]
+WantedBy=multi-user.target
