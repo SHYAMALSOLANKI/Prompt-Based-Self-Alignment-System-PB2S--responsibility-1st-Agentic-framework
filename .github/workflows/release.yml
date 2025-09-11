@@ -1,14 +1,15 @@
-name: PB2S Release (Core)
+name: PB2S Release (Core, UI-only)
+
+permissions:
+  contents: write   # allow attaching files to the Release
 
 on:
-  push:
-    tags:
-      - 'v*'   # e.g., v0.2.1.1
+  release:
+    types: [published]   # runs when you click "Publish release" in the UI
 
 jobs:
   test-and-release:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -32,7 +33,6 @@ jobs:
           python scripts/sot_verify.py --spec "$SPEC" --sections 2..10 --schema "$SCHEMA"
 
       - name: Start ephemeral PB2S Planner (mock)
-/* start planner */
         run: |
           python - <<'PY' &
           from fastapi import FastAPI
@@ -60,51 +60,42 @@ jobs:
           for i in {1..60}; do curl -fsS http://127.0.0.1:8000/openapi.json && break; sleep 1; done
 
       - name: Run Core Conformance
-        run: |
-          python scripts/conformance.py --endpoint http://127.0.0.1:8000/chat
+        run: python scripts/conformance.py --endpoint http://127.0.0.1:8000/chat
 
       - name: Build release bundle
         run: |
           set -e
           mkdir -p dist
-          # Compute SOT SHA-256 for §§2–10 (normalized newlines, trimmed)
+          # Compute SOT SHA-256 for §§2–10 (normalized)
           python - <<'PY' > dist/SOT_SHA256.txt
           import re,hashlib,sys
           from pathlib import Path
           spec = Path("SPECIFICATION/SPEC-2_Total_Attention_EdgeAI_v0.2.1.1_RELEASE.md").read_text(encoding="utf-8")
-          # Extract sections 2..10
           sections=[]
           for i in range(2,11):
               m=re.search(rf"(?m)^## {i}\) .*?(?=^## \d\)|\\Z)", spec, flags=re.S)
               if not m: print(f"Missing section {i}"); sys.exit(2)
               sections.append(m.group(0))
           blob="\n\n".join(sections)
-          # Normalize: CRLF->LF, strip trailing spaces
           blob="\n".join(line.rstrip() for line in blob.replace("\r\n","\n").split("\n"))
           h=hashlib.sha256(blob.encode("utf-8")).hexdigest()
           print(f"SOT_SHA256={h}")
           PY
-          # Pick evidence if present
-          EVID=$(ls docs/challenges/*.json 2>/dev/null || true)
-          # Assemble zip
-          ZIP="dist/pb2s_edge_brain_${GITHUB_REF_NAME}.zip"
+          # Create ZIP (core-only)
+          ZIP="dist/pb2s_edge_brain_${{ github.event.release.tag_name }}.zip"
           zip -r "$ZIP" \
             SPECIFICATION/SPEC-2_Total_Attention_EdgeAI_v0.2.1.1_RELEASE.md \
             schemas \
             scripts \
-            docs/challenges \
             dist/SOT_SHA256.txt \
             2>/dev/null || zip -r "$ZIP" SPECIFICATION schemas scripts dist/SOT_SHA256.txt
-          # Checksums
           sha256sum "$ZIP" > dist/SHA256SUMS.txt
 
-      - name: Create GitHub Release
-        uses: softprops/action-gh-release@v1
+      - name: Attach files to this Release
+        uses: softprops/action-gh-release@v2
         with:
+          tag_name: ${{ github.event.release.tag_name }}
           files: |
-            dist/pb2s_edge_brain_${{ github.ref_name }}.zip
+            dist/pb2s_edge_brain_${{ github.event.release.tag_name }}.zip
             dist/SHA256SUMS.txt
             dist/SOT_SHA256.txt
-          generate_release_notes: true
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
