@@ -1,143 +1,217 @@
 name: PB2S Spec SOT + Conformance (v0.2.1.1)
 
+
 on:
+
   push:
+
   pull_request:
+
+  workflow_dispatch:
+
   schedule:
-    - cron: "23 2 * * *"   # nightly drift check (02:23 UTC)
+
+    - cron: "23 2 * * *"   # nightly drift check
+
 
 concurrency:
+
   group: pb2s-${{ github.ref }}
+
   cancel-in-progress: true
 
+
 permissions:
+
   contents: read
 
+
 env:
-  # Adjust this if you store the release spec elsewhere in the repo
+
   SPEC_PATH: SPEC-2_Total_Attention_EdgeAI_v0.2.1.1_RELEASE.md
-  # Optional: set a remote planner endpoint in repo/ORG secrets; falls back to local server if unset
+
   PB2S_ENDPOINT: ${{ secrets.PB2S_ENDPOINT }}
 
+
 jobs:
+
   conformance:
+
     runs-on: ubuntu-latest
+
     timeout-minutes: 25
 
-    defaults:
-      run:
-        shell: bash -eo pipefail
-
     steps:
+
       - name: Checkout
+
         uses: actions/checkout@v4
 
+
       - name: Set up Python
+
         uses: actions/setup-python@v5
+
         with:
+
           python-version: '3.11'
 
-      - name: Install deps
+
+      - name: Install dependencies
+
         run: |
+
           python -m pip install --upgrade pip
+
           if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
-          # minimal runners for bus tests if your scripts vendor these:
+
           pip install paho-mqtt orjson jsonschema
 
-      # --- SOT: verify the file being tested is the file you ship ---
-      - name: Verify Spec SOT (sections 2..10; proof v2 schema)
+
+      # ---- Source-of-Truth check (spec sections + proof schema) ----
+
+      - name: Verify Spec SOT
+
         run: |
-          test -f "$SPEC_PATH" || { echo "Spec file not found: $SPEC_PATH"; exit 2; }
-          test -f schemas/pb2s_proof.v2.schema.json || { echo "Missing schemas/pb2s_proof.v2.schema.json"; exit 2; }
+
+          test -f "$SPEC_PATH"
+
+          test -f schemas/pb2s_proof.v2.schema.json
+
           python scripts/sot_verify.py \
+
             --spec "$SPEC_PATH" \
+
             --sections 2..10 \
+
             --schema schemas/pb2s_proof.v2.schema.json \
-            --commit "${{ github.sha }}"
 
-      # --- Option A: start your planner locally on the runner (if present) ---
+            --commit "${GITHUB_SHA}"
+
+
+      # ---- Try to start a local server (optional). If you host one, set PB2S_ENDPOINT secret. ----
+
       - name: Start local PB2S planner (best-effort)
-        run: |
-          if [ -f main.py ]; then
-            nohup python main.py >/tmp/pb2s_server.log 2>&1 &
-          elif [ -f server.py ]; then
-            nohup python server.py >/tmp/pb2s_server.log 2>&1 &
-          elif ls -1 *.py | grep -q uvicorn; then
-            nohup uvicorn main:app --host 0.0.0.0 --port 8000 >/tmp/pb2s_server.log 2>&1 &
-          else
-            echo "No local server entrypoint found; will use PB2S_ENDPOINT if provided."
-          fi
-          # wait up to 60s for local server
-          for i in {1..60}; do
-            curl -fsS http://127.0.0.1:8000/openapi.json && break || sleep 1
-          done || true
 
-      # --- Core conformance: PB2S v0.2.1.1 structure + proof v2 ---
-      - name: PB2S core conformance
         run: |
+
+          set +e
+
+          if [ -f main.py ]; then
+
+            nohup python main.py >/tmp/pb2s_server.log 2>&1 &
+
+          elif [ -f server.py ]; then
+
+            nohup python server.py >/tmp/pb2s_server.log 2>&1 &
+
+          fi
+
+          for i in $(seq 1 45); do
+
+            curl -fsS http://127.0.0.1:8000/openapi.json >/dev/null && break
+
+            sleep 1
+
+          done
+
+          set -e || true
+
+
+      - name: PB2S core conformance (structure + proof v2)
+
+        run: |
+
           EP="${PB2S_ENDPOINT:-http://127.0.0.1:8000/chat}"
-          echo "Testing endpoint: $EP"
+
+          echo "Endpoint: $EP"
+
           python scripts/conformance.py --endpoint "$EP"
 
-      # --- Bring up local MQTT broker for bus/bridge acceptance tests ---
-      - name: Install Mosquitto (local broker for ATs)
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y mosquitto mosquitto-clients
-          sudo systemctl enable mosquitto
-          sudo systemctl start mosquitto
-          sleep 1
-          mosquitto_sub -t '$SYS/broker/version' -C 1 || true
 
-      # --- AT-1..AT-7 acceptance tests bound to SPEC-2 (symbols-only, heartbeat, determinism, etc.) ---
-      - name: AT-1 Symbols-Only Ingress (bridge/allow-list behavior)
+      # ---- Bus / bridge acceptance tests (AT-1..AT-7) ----
+
+      - name: Install Mosquitto broker
+
+        run: |
+
+          sudo apt-get update
+
+          sudo apt-get install -y mosquitto mosquitto-clients
+
+          sudo systemctl start mosquitto
+
+
+      - name: AT-1 Symbols-only ingress
+
         run: python scripts/at_bus.py --case symbols_only
 
-      - name: AT-2 Dead-man Stop (20ms hb; 2 misses => hold ≤40ms)
+
+      - name: AT-2 Dead-man stop (hb window)
+
         run: python scripts/at_bus.py --case deadman
 
-      - name: AT-3 Determinism (planner-only; temp ≤ 0.2; fixed seed)
+
+      - name: AT-3 Determinism (temp ≤ 0.2; fixed seed)
+
         run: |
+
           EP="${PB2S_ENDPOINT:-http://127.0.0.1:8000/chat}"
+
           python scripts/at_determinism.py --endpoint "$EP" --runs 10
 
-      - name: AT-4 CLARIFY Path (two questions on unresolved contradiction)
+
+      - name: AT-4 CLARIFY path (two questions)
+
         run: |
+
           EP="${PB2S_ENDPOINT:-http://127.0.0.1:8000/chat}"
+
           python scripts/at_clarify.py --endpoint "$EP"
 
-      - name: AT-5 Proof→Action Integrity (audit_ref propagation to exec/*)
+
+      - name: AT-5 Proof→Action integrity
+
         run: python scripts/at_proof_to_action.py
 
-      - name: AT-6 ε Keep-Alive under TOTAL (non-focused topics ≥1 msg/s)
+
+      - name: AT-6 Keep-alive under TOTAL
+
         run: python scripts/at_bus.py --case keepalive
 
-      - name: AT-7 Retention & Hashing policy present (sample artifacts SHA-256)
+
+      - name: AT-7 Retention hashing policy present
+
         run: python scripts/at_retention.py --policy configs/retention.yaml
 
-      # --- Evidence bundle for reproducibility ---
+
+      # ---- Evidence bundle ----
+
       - name: Write evidence manifest
+
         run: |
+
           mkdir -p docs/challenges
-          python - <<'PY'
-import json, os
-out = {
-  "spec": "pb2s_v0.2.1.1_release",
-  "commit": os.getenv("GITHUB_SHA"),
-  "endpoint": os.getenv("PB2S_ENDPOINT","local"),
-  "passed": ["core","AT-1","AT-2","AT-3","AT-4","AT-5","AT-6","AT-7"]
-}
-open("docs/challenges/evidence_manifest.json","w").write(json.dumps(out, indent=2))
-PY
+
+          python -c "import json,os,pathlib; path=pathlib.Path('docs/challenges/evidence_manifest.json'); path.parent.mkdir(parents=True, exist_ok=True); data={'spec':'pb2s_v0.2.1.1_release','commit':os.environ.get('GITHUB_SHA',''),'endpoint':os.environ.get('PB2S_ENDPOINT','local'),'passed':['core','AT-1','AT-2','AT-3','AT-4','AT-5','AT-6','AT-7']}; path.write_text(json.dumps(data, indent=2))"
+
 
       - name: Upload evidence artifacts
-        uses: actions/upload-artifact@v4
+
         if: always()
+
+        uses: actions/upload-artifact@v4
+
         with:
+
           name: pb2s_evidence_${{ github.run_id }}
+
           path: |
+
             docs/challenges/evidence_manifest.json
+
             /tmp/pb2s_server.log
-            logs/**/*.json
-            logs/**/*.log
-            proofs/**/*.json
+
+            logs
+
+            proofs
