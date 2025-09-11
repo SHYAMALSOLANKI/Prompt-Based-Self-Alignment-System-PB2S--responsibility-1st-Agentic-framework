@@ -147,20 +147,24 @@ jobs:
 
       # ---- Evidence bundle ----
       - name: Write evidence manifest
-        shell: bash
-        run: |
-          mkdir -p docs/challenges
-          python - <<'PY'
+  shell: bash
+  run: |
+    mkdir -p docs/challenges
+    python - <<'PY'
 import json, os, pathlib
+
 path = pathlib.Path('docs/challenges/evidence_manifest.json')
 path.parent.mkdir(parents=True, exist_ok=True)
+
 data = {
-  'spec': 'pb2s_v0.2.1.1_release',
-  'commit': os.environ.get('GITHUB_SHA',''),
-  'endpoint': os.environ.get('PB2S_ENDPOINT','local'),
-  'passed': ['core','AT-1','AT-2','AT-3','AT-4','AT-5','AT-6','AT-7']
+  "spec": "pb2s_v0.2.1.1_release",
+  "commit": os.environ.get("GITHUB_SHA", ""),
+  "endpoint": os.environ.get("PB2S_ENDPOINT", "local"),
+  "passed": ["core","AT-1","AT-2","AT-3","AT-4","AT-5","AT-6","AT-7"]
 }
+
 path.write_text(json.dumps(data, indent=2))
+print(f"Wrote {path}")
 PY
 
       - name: Upload evidence artifacts
