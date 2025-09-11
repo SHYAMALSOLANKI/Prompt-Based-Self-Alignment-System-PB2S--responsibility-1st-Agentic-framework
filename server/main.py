@@ -1,40 +1,37 @@
-import time, json, threading
-from collections import deque
-import paho.mqtt.client as mq
+from fastapi import FastAPI
+from pydantic import BaseModel
+import time, uuid
 
-BROKER="localhost"; QOS=1
-BUF = deque(maxlen=64)
-state = {"mode":"FAIR","risk": {"audio":0.0,"vision":0.0}}
+app = FastAPI(title="PB2S Minimal /chat Server", version="0.1.0")
 
-def novelty(e): return e.get("novelty",0.0)
-def policy_priority(e): return e.get("priority",0.0)
+class ChatIn(BaseModel):
+    message: str
 
-def on_msg(_c,_u,msg):
-    try: BUF.append(json.loads(msg.payload))
-    except: pass
+@app.post("/chat")
+def chat(body: ChatIn):
+    # Minimal, structure-complete reply (mock). Swap with your model later.
+    draft = f"- Initial take on: {body.message}"
+    reflect = (
+        "- contradiction: none material; check evidence sources\n"
+        "- unjustified assumption: clarify scope\n"
+        "- missing evidence: cite at least one source type"
+    )
+    revise = "- adjusted explanation with scope + reference types"
+    learned = "- concise takeaways"
 
-def select_focus():
-    best,score=None,-1e9
-    for e in list(BUF):
-        s=0.4*novelty(e)+0.3*state["risk"].get(e.get("source",""),0.0)+0.2*policy_priority(e)-0.1*e.get("age",0.0)
-        if s>score: best,score=e,s
-    return best
+    text = (
+        "DRAFT\n" + draft + "\n\n" +
+        "REFLECT\n" + reflect + "\n\n" +
+        "REVISE\n" + revise + "\n\n" +
+        "LEARNED\n" + learned
+    )
 
-def tick(client):
-    while True:
-        f = select_focus()
-        if f:
-            req = {"v":1,"context":f,"facts":[],"policy":{"maxCycles":2,"temp":0.2}}
-            client.publish("planner/requests", json.dumps(req), qos=QOS)
-        time.sleep(0.1)  # 10Hz scan
+    proof = {
+        "decision": "APPROVE",
+        "cycles": 1,
+        "audit_ref": f"run-{time.strftime('%Y%m%d-%H%M%S')}-{uuid.uuid4().hex[:8]}"
+    }
+    return {"text": text, "pb2s_proof": proof}
 
-def main():
-    c = mq.Client(client_id="attention")
-    c.on_message=on_msg
-    c.connect(BROKER,1883,60)
-    c.subscribe("sym/#", qos=0)
-    threading.Thread(target=tick, args=(c,), daemon=True).start()
-    c.loop_forever()
-
-if __name__ == "__main__":
-    main()
+# Run locally:
+# uvicorn server.main:app --reload --port 8000
