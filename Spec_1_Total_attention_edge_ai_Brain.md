@@ -1,4 +1,4 @@
-# SPEC-2—Total Attention Edge‑AI Brain (Pi5 ×3 + Orin Nano 8GB)
+# SPEC-1—Total Attention Edge‑AI Brain (Pi5 ×3 + Orin Nano 8GB)
 
 ## Background
 
