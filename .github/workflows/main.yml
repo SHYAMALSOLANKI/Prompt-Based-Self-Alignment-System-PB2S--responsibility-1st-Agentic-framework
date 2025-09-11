@@ -1,117 +1,61 @@
-name: PB2S Conformance
+name: PB2S Conformance & Acceptance Tests
 
 on:
   push:
     paths:
-      - 'SPECIFICATION/**'
-      - 'schemas/**'
+      - 'specification/**'
       - 'scripts/**'
-      - 'server/**'
       - '.github/workflows/**'
-      - 'README.md'
-      - 'requirements.txt'
   pull_request:
+    paths:
+      - 'specification/**'
+      - 'scripts/**'
 
 jobs:
-  conformance:
+  pb2s_ci:
+    name: Run Conformance Tests
     runs-on: ubuntu-latest
-    # Point all “provider/endpoint” envs at the local API we’ll start below
-    env:
-      PB2S_ENDPOINT: http://127.0.0.1:8000
-      PROVIDER_P1:   http://127.0.0.1:8000
-      P1_URL:        http://127.0.0.1:8000
 
     steps:
-      - name: Checkout
+      - name: Checkout Repo
         uses: actions/checkout@v4
 
-      - name: Setup Python
+      - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: '3.11'
 
-      - name: Install deps
+      - name: Install Dependencies
         run: |
-          python -m pip install -U pip
-          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
-          # Ensure test/runtime deps exist even if not in requirements.txt
-          pip install uvicorn fastapi httpx jsonschema pytest
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
 
-      - name: List specs
-        run: ls -la SPECIFICATION || true
-
-      # Detect a FastAPI app to run (tries common module paths)
-      - name: Detect API entrypoint
-        id: detect
-        shell: bash
+      - name: Validate SOT Sections
         run: |
-          python - <<'PY'
-          import importlib, sys, pathlib
-          cands = ["app.api:app","server.api:app","server.main:app","server.app:app"]
-          for c in cands:
-            try:
-              m,n = c.split(":"); mod = importlib.import_module(m); getattr(mod,n)
-              pathlib.Path("APP_IMPORT.txt").write_text(c)
-              print("FOUND", c); sys.exit(0)
-            except Exception: pass
-          print("NO_APP_FOUND")  # tests may still use TestClient; that’s ok
-          PY
+          python scripts/sot_verify.py \
+            --spec specification/SPEC-2_Total_Attention_EdgeAI_v0.2.1.1_RELEASE.md \
+            --sections 2..10 \
+            --schema schemas/pb2s_proof.v2.schema.json
 
-      # Start API only if we found one; run in background and wait until ready
-      - name: Start API
-        if: hashFiles('APP_IMPORT.txt') != ''
+      - name: Start PB2S Planner (local simulation)
         run: |
-          APP=$(cat APP_IMPORT.txt)
-          echo "Starting uvicorn ${APP}"
-          nohup uvicorn ${APP} --host 0.0.0.0 --port 8000 > uvicorn.log 2>&1 &
-          for i in {1..30}; do
-            if curl -fsS http://127.0.0.1:8000/openapi.json >/dev/null; then
-              echo "API is up"; break; fi; sleep 1;
-          done
+          python main.py &
+          for i in {1..60}; do curl -fsS http://127.0.0.1:8000/openapi.json && break; sleep 1; done
 
-      - name: PB2S core conformance
+      - name: Run Core Conformance Test
         run: |
-          if [ -f scripts/conformance.py ]; then
-            python scripts/conformance.py
-          else
-            echo "No scripts/conformance.py; skipping"
-          fi
+          python scripts/conformance.py --endpoint http://127.0.0.1:8000/chat
 
-      - name: AT bundle
+      - name: Run Acceptance Test Bundle (AT‑1 to AT‑7)
         run: |
-          set -e
-          [ -f scripts/at_bus.py ]             && python scripts/at_bus.py || true
-          [ -f scripts/at_determinism.py ]     && python scripts/at_determinism.py || true
-          [ -f scripts/at_clarify.py ]         && python scripts/at_clarify.py || true
-          [ -f scripts/at_proof_to_action.py ] && python scripts/at_proof_to_action.py || true
-          [ -f scripts/at_retention.py ]       && python scripts/at_retention.py || true
+          python scripts/at_bus.py
+          python scripts/at_determinism.py
+          python scripts/at_clarify.py
+          python scripts/at_proof_to_action.py
+          python scripts/at_retention.py
 
-      - name: Write evidence manifest
-        shell: bash
-        run: |
-          mkdir -p docs/challenges
-          python - <<'PY'
-          import json, os, pathlib
-          p = pathlib.Path('docs/challenges/evidence_manifest.json')
-          p.write_text(json.dumps({
-            "spec": "pb2s_v0.2.1_release",
-            "commit": os.environ.get("GITHUB_SHA",""),
-            "endpoint": os.environ.get("PB2S_ENDPOINT","local"),
-            "passed": ["core","AT-1","AT-2","AT-3","AT-4","AT-5","AT-6","AT-7"]
-          }, indent=2))
-          print("Wrote", p)
-          PY
-
-      - name: Upload evidence artifacts
-        if: always()
+      - name: Upload Test Artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: pb2s_evidence_${{ github.run_id }}
-          path: docs/challenges/**
-
-      - name: Print server logs on failure
-        if: failure()
-        run: |
-          echo "::group::uvicorn.log"
-          [ -f uvicorn.log ] && tail -n +1 uvicorn.log || echo "no uvicorn.log"
-          echo "::endgroup::"
+          name: pb2s_evidence
+          path: docs/challenges/*.json
