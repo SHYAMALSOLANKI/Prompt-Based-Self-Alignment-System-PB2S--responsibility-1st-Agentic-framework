@@ -1,0 +1,7 @@
+services:
+  broker-small:
+    image: eclipse-mosquitto:2
+    restart: unless-stopped
+    network_mode: "host"   # or map ports if you prefer
+    volumes:
+      - ../infra/mosquitto/small:/mosquitto/config
