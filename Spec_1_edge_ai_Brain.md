@@ -1,4 +1,4 @@
-# SPEC-1—Total Attention Edge‑AI Brain (Pi5 ×3 + Orin Nano 8GB)
+# SPEC-2—Total Attention Edge‑AI Brain (Pi5 ×3 + Orin Nano 8GB)
 
 ## Background
 
@@ -33,6 +33,16 @@ You want a self‑contained, policy‑governed edge system that gives **100% Att
 * Cloud training; no external identity/SSO; no internet dependency for core functions.
 
 ## Method
+
+### Safety Defaults — LOCKED (authority‑blind, rule‑abiding)
+
+* **RP2040‑only motor interlock**: motor power is gated by MCU hardware; Pi/Jetson cannot override. E‑stop interrupt→halt **≤5 ms**.
+* **Attention heartbeat**: **20 ms** period; **40 ms** deadline (two misses) triggers halt at MCU. Hazard IRQ always preempts and halts.
+* **Observation‑Only safe boot**: if `ethos.yml` or policy is missing/invalid, system comes up with motors disabled; perception/logging only.
+* **Data self‑protection**: erase/reset/model‑delete commands require a signed **maintenance token**; otherwise DENY.
+* **Thermal/current envelope**: enforced in MCU; out‑of‑envelope commands are clamped/denied.
+* **CR‑Events mandatory**: semantic/container mismatch must be corrected before acting; log in `pb2s_proof`.
+* **Authority‑blind rule**: identity/role is never a reason to allow; only rules and rights evidence.
 
 ### Hardware Topology
 
@@ -182,14 +192,23 @@ EG -> AO : decision + pb2s_proof
 ```yaml
 system:
   event_bus: mqtt
-  attention: {mode: AUTO, epsilon_keepalive: 0.05}
+  attention:
+    mode: AUTO
+    heartbeat_ms: 20         # LOCKED
+    deadman_ms: 40           # LOCKED
+    epsilon_keepalive: 0.05
+safety:
+  mcu_interlock: true        # LOCKED; Pi cannot bypass
+  observation_only_on_policy_error: true
+  maintenance_token_required: true
+  hazard_irq_gpio: 24        # example; wired to RP2040 interrupt
 vision:
   model: yolo_n_int8.tflite
-  target: AUTO          # CPU|NPU|AUTO
+  target: AUTO               # CPU|NPU|AUTO
   fps_cap: 30
   topics: {out: vision/detections}
 hearing:
-  stt: vosk             # or whispercpp_small
+  stt: vosk                  # or whispercpp_small
   vad: webrtc
   topics: {out: hearing/stt}
 exec:
@@ -377,6 +396,61 @@ EG -> AnyActor : deny + pb2s_proof
 8. **CPU discipline**
 
    * Reserve 1–2 cores for AO/SGEE via `systemd` slices + `CPUQuota`; set RT priority for heartbeat; thermal guardrails.
+
+---
+
+### DevOps — Containers & Makefile (copy to repo)
+
+**Dockerfile (PB2S API skeleton)**
+
+```dockerfile
+# ./Dockerfile
+FROM python:3.11-slim
+WORKDIR /app
+COPY requirements.txt ./
+RUN pip install --no-cache-dir -r requirements.txt
+COPY app ./app
+COPY schemas ./schemas
+EXPOSE 8000
+CMD ["uvicorn", "app.api:app", "--host", "0.0.0.0", "--port", "8000"]
+```
+
+**docker-compose.yml**
+
+```yaml
+version: "3.9"
+services:
+  bus:
+    image: eclipse-mosquitto:2
+    ports: ["1883:1883"]
+    volumes:
+      - ./ops/mosquitto:/mosquitto
+  pb2s:
+    build: .
+    ports: ["8000:8000"]
+    environment:
+      - PB2S_SEED=42
+      - PB2S_TEMP=0.2
+    depends_on: [bus]
+```
+
+**Makefile**
+
+```makefile
+.PHONY: up down build test
+build:
+	docker compose build
+up:
+	docker compose up -d
+Down:
+	docker compose down
+Test:
+	python scripts/conformance.py
+```
+
+> Note: Add `ops/mosquitto/mosquitto.conf` with a minimal listener to persist topics if desired.
+
+---
 
 ## Milestones
 
