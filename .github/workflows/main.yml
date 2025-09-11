@@ -6,15 +6,15 @@ on:
       - 'SPECIFICATION/**'
       - 'schemas/**'
       - 'scripts/**'
+      - 'server/**'
       - '.github/workflows/**'
-      - 'main.py'
   pull_request:
     paths:
       - 'SPECIFICATION/**'
       - 'schemas/**'
       - 'scripts/**'
+      - 'server/**'
       - '.github/workflows/**'
-      - 'main.py'
 
 jobs:
   conformance:
@@ -34,15 +34,15 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
-          # Ensure CI has basics even if requirements.txt is minimal
+          # make sure CI has the basics
           pip install fastapi uvicorn pydantic requests jsonschema
 
       - name: Show layout (debug)
         run: |
-          echo "== Root ==" && ls -la
           echo "== SPECIFICATION ==" && ls -la SPECIFICATION || true
           echo "== schemas ==" && ls -la schemas || true
           echo "== scripts ==" && ls -la scripts || true
+          echo "== server ==" && ls -la server || true
 
       - name: Validate SOT Sections
         run: |
@@ -55,12 +55,35 @@ jobs:
           echo "Using schema: $SCHEMA"
           python scripts/sot_verify.py --spec "$SPEC" --sections 2..10 --schema "$SCHEMA"
 
-      - name: Start PB2S Planner (local simulation)
+      - name: Ensure package import works
         run: |
-          python main.py &
+          # make server a Python package so uvicorn can import server.main:app
+          test -f server/__init__.py || touch server/__init__.py
+          python - <<'PY'
+          import importlib
+          import sys
+          m = importlib.import_module("server.main")
+          assert hasattr(m, "app"), "server.main must define 'app'"
+          print("server.main:app import OK")
+          PY
+
+      - name: Start PB2S Planner (server.main:app)
+        run: |
+          set -euo pipefail
+          # start uvicorn and log to file
+          python -c "import uvicorn; uvicorn.run('server.main:app', host='0.0.0.0', port=8000)" > server.log 2>&1 &
+          echo "Waiting for API to be ready…"
           for i in {1..60}; do
-            curl -fsS http://127.0.0.1:8000/openapi.json && break
+            if curl -fsS http://127.0.0.1:8000/openapi.json >/dev/null; then
+              echo "API is up."
+              break
+            fi
             sleep 1
+            if [ $i -eq 60 ]; then
+              echo "API did not start. Dumping server.log:"
+              sed -n '1,200p' server.log || true
+              exit 1
+            fi
           done
 
       - name: Run Core Conformance Test
@@ -69,7 +92,6 @@ jobs:
 
       - name: Run Acceptance Test Bundle (AT-1..AT-7)
         run: |
-          # Run only tests that exist in your repo
           [ -f scripts/at_bus.py ] && python scripts/at_bus.py || true
           [ -f scripts/at_determinism.py ] && python scripts/at_determinism.py || true
           [ -f scripts/at_clarify.py ] && python scripts/at_clarify.py || true
