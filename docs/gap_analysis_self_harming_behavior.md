@@ -30,7 +30,7 @@ Self-harming behavior in AI includes:
 
 ## 3. Identified Gaps
 ### 3.1 Content Moderation Absence
-- **Status**: CLOSED - Added keyword-based filtering for harmful content in dashboard tools (Wikipedia, News, Translation, Dictionary, Calculator, File Upload) and server inputs. Warnings displayed for flagged content.
+- **Status**: CLOSED - Added keyword-based filtering focused on NSFW content harmful for under 18 (porn, sex, deepfakes, etc.). Allows educational/historical contexts. Displays warnings for flagged content.
 - **Remaining**: Could enhance with ML-based classifiers for better accuracy.
 
 ### 3.2 Incomplete PB2S Implementation
@@ -54,16 +54,10 @@ Self-harming behavior in AI includes:
 - **Remaining**: Add session management and circuit breakers.
 
 ## 4. Specific Scenarios of Self-Harming Behavior
-1. **Harmful Content Retrieval**: User queries sensitive topics (e.g., "how to make explosives"); AI fetches and displays without flagging.
-2. **Biased Translation**: Translating hate speech or propaganda without moderation.
-3. **Malicious File Analysis**: Uploading harmful files; AI processes without security checks.
-4. **Unmonitored Chat**: Free-form chat without PB2S loop generates unsafe advice.
-5. **API Exploitation**: Malicious inputs to tools causing API errors or harmful responses.
-6. **Contradiction Oversight**: Subtle contradictions missed, leading to harmful recommendations.
-7. **Resource Exhaustion**: Repeated requests overwhelm system or APIs.
-8. **Data Exposure**: Logs or outputs contain sensitive information.
-9. **Jailbreak Attempts**: Users bypass safeguards with crafted prompts.
-10. **Foggy Prompts**: Ambiguous inputs lead to misaligned, potentially harmful outputs.
+1. **Explicit NSFW Content**: User queries or content containing explicit sexual material gets moderated with appropriate warnings.
+2. **Educational Context Preservation**: Historical, scientific, or educational content about sensitive topics (e.g., "history of weapons") is allowed without moderation.
+3. **Factual Information Access**: Truthful information about sensitive topics remains accessible while protecting against explicit harmful content.
+4. **Context-Aware Filtering**: System distinguishes between educational discussions and explicit NSFW material.
 
 ## 5. Proposed Improvements
 ### 5.1 Enhance Content Moderation
@@ -102,7 +96,7 @@ Self-harming behavior in AI includes:
 - **Low Priority**: Advanced escalation, authentication, automated alerts
 
 ## 7. Conclusion
-Significant progress has been made in sealing gaps for self-harming behavior in PB2S. Content moderation, enhanced contradiction detection, rate limiting, and full PB2S loop integration have been implemented, greatly improving safety and alignment. Remaining gaps are minor and can be addressed in future iterations. The system now better upholds bound freedom and self-safety, with robust safeguards against harmful outputs and inputs.
+Significant progress has been made in sealing gaps for self-harming behavior in PB2S. The content moderation system now intelligently distinguishes between educational/factual content and explicit NSFW material, preserving access to truthful information while protecting users under 18 from harmful explicit content. Enhanced contradiction detection, rate limiting, and full PB2S loop integration provide robust safeguards. The system maintains PB2S's commitment to bound freedom and self-safety with a nuanced approach that doesn't dilute truth.
 
 ## 8. Next Steps
 - Review and prioritize improvements

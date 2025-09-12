@@ -28,11 +28,31 @@ def chat(body: ChatIn):
         return {"text": "Rate limit exceeded. Please wait a minute before sending another message.", "pb2s_proof": {"decision": "CLARIFY", "cycles": 0, "audit_ref": f"run-{time.strftime('%Y%m%d-%H%M%S')}-{uuid.uuid4().hex[:8]}"}}
     request_log.append(current_time)
     
-    # Content Moderation on Input
-    harmful_keywords = ["bomb", "explosive", "weapon", "hate", "violence", "terrorism", "suicide", "abuse"]
+    # Content Moderation on Input - Focus on NSFW content harmful for under 18
+    nsfw_keywords = [
+        "porn", "sex", "nude", "naked", "erotic", "adult", "xxx", "nsfw", "fetish", 
+        "orgasm", "masturbat", "vagina", "penis", "anus", "oral", "anal", "bdsm",
+        "rape", "incest", "pedophil", "child porn", "underage", "teen sex",
+        "deepfake", "deepfakes"
+    ]
+    
+    # Allow educational/historical context
+    educational_contexts = [
+        "history", "science", "education", "documentary", "museum", "academic", 
+        "research", "encyclopedia", "historical", "scientific", "medical"
+    ]
+    
     msg_lower = body.message.lower()
-    if any(word in msg_lower for word in harmful_keywords):
-        return {"text": "⚠️ Input contains potentially harmful content. Please rephrase responsibly.", "pb2s_proof": {"decision": "CLARIFY", "cycles": 0, "audit_ref": f"run-{time.strftime('%Y%m%d-%H%M%S')}-{uuid.uuid4().hex[:8]}"}}
+    
+    # Check for NSFW content
+    nsfw_flagged = [word for word in nsfw_keywords if word in msg_lower]
+    
+    if nsfw_flagged:
+        # Check if it's in an educational context
+        has_educational_context = any(ctx in msg_lower for ctx in educational_contexts)
+        
+        if not has_educational_context:
+            return {"text": "⚠️ NSFW Content Warning: Your message contains explicit material not suitable for users under 18. Please rephrase appropriately.", "pb2s_proof": {"decision": "CLARIFY", "cycles": 0, "audit_ref": f"run-{time.strftime('%Y%m%d-%H%M%S')}-{uuid.uuid4().hex[:8]}"}}
     contradiction = False
     contradiction_type = "none"
     msg = body.message.lower()

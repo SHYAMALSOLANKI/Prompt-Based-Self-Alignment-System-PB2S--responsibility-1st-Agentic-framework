@@ -69,7 +69,7 @@ with tab2:
     st.markdown("""
     <hr style='margin:2em 0 1em 0;'>
     <h2>📚 Ask Wikipedia</h2>
-    <span style='font-size:1.08em;'>Type any topic, and PB2S will fetch a summary from Wikipedia (free, copyright-safe). <b>Note:</b> Content may contain sensitive topics. Use responsibly.</span>
+    <span style='font-size:1.08em;'>Type any topic, and PB2S will fetch a summary from Wikipedia (free, copyright-safe). <b>Note:</b> Educational and factual content is preserved; only explicit NSFW material is moderated.</span>
     """, unsafe_allow_html=True)
     wiki_query = st.text_input("Wikipedia topic (e.g. Alan Turing, Quantum Computing)", key="wiki_query")
     if st.button("Search Wikipedia", key="wiki_btn") and wiki_query.strip():
@@ -95,7 +95,7 @@ with tab2:
     st.markdown("""
     <hr style='margin:2em 0 1em 0;'>
     <h2>🌐 Translate Anything</h2>
-    <span style='font-size:1.08em;'>Translate text between languages using LibreTranslate (no API key needed, open/free endpoint). <b>Note:</b> Translations may include sensitive content. Verify accuracy.</span>
+    <span style='font-size:1.08em;'>Translate text between languages using LibreTranslate (no API key needed, open/free endpoint). <b>Note:</b> Preserves all content except explicit NSFW material.</span>
     """, unsafe_allow_html=True)
     trans_text = st.text_input("Text to translate", key="trans_text")
     lang_options = {"English":"en", "Hindi":"hi", "Spanish":"es", "French":"fr", "German":"de", "Chinese":"zh"}
@@ -130,7 +130,7 @@ with tab2:
     st.markdown("""
     <hr style='margin:2em 0 1em 0;'>
     <h2>📰 Latest News Headlines</h2>
-    <span style='font-size:1.08em;'>Get top news headlines from around the world (free, courtesy of NewsAPI). <b>Note:</b> News may contain sensitive or biased information. Cross-check sources.</span>
+    <span style='font-size:1.08em;'>Get top news headlines from around the world (free, courtesy of NewsAPI). <b>Note:</b> News content is preserved; only explicit NSFW material is moderated.</span>
     """, unsafe_allow_html=True)
     news_country = st.selectbox("Country", ["us", "in", "gb", "ca", "au"], key="news_country")
     if st.button("Get News", key="news_btn"):
@@ -309,15 +309,34 @@ import streamlit as st
 import requests
 import os
 
-# Content Moderation Function
+# Content Moderation Function - Focus on NSFW content harmful for under 18
 def moderate_content(text, source="general"):
-    harmful_keywords = [
-        "bomb", "explosive", "weapon", "hate", "violence", "terrorism", "suicide", "abuse", "porn", "drugs", "illegal"
+    # Focus on explicit NSFW content rather than general sensitive topics
+    nsfw_keywords = [
+        "porn", "sex", "nude", "naked", "erotic", "adult", "xxx", "nsfw", "fetish", 
+        "orgasm", "masturbat", "vagina", "penis", "anus", "oral", "anal", "bdsm",
+        "rape", "incest", "pedophil", "child porn", "underage", "teen sex",
+        "deepfake", "deepfakes"
     ]
+    
+    # Allow educational/historical context for sensitive topics
+    educational_contexts = [
+        "history", "science", "education", "documentary", "museum", "academic", 
+        "research", "encyclopedia", "historical", "scientific", "medical"
+    ]
+    
     text_lower = text.lower()
-    flagged = [word for word in harmful_keywords if word in text_lower]
-    if flagged:
-        return f"⚠️ Content Warning: This {source} contains potentially harmful or sensitive material related to: {', '.join(flagged)}. Please use responsibly and verify information."
+    
+    # Check for NSFW content
+    nsfw_flagged = [word for word in nsfw_keywords if word in text_lower]
+    
+    if nsfw_flagged:
+        # Check if it's in an educational context
+        has_educational_context = any(ctx in text_lower for ctx in educational_contexts)
+        
+        if not has_educational_context:
+            return f"⚠️ NSFW Content Warning: This {source} contains explicit material not suitable for users under 18: {', '.join(nsfw_flagged)}. Access restricted."
+    
     return None
 
 # --- User Instructions ---
