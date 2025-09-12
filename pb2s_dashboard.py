@@ -1,3 +1,5 @@
+import streamlit as st
+
 # --- Feature Roadmap & Feedback ---
 st.markdown("""
 <hr style='margin:2em 0 1em 0;'>
@@ -57,8 +59,8 @@ with tab4:
     <br>
     <b>What would you like to see first?</b> Use the feedback box below to vote, suggest, or comment!
     """, unsafe_allow_html=True)
-    user_feedback = st.text_area("Your feedback, votes, or feature ideas (optional)", key="user_feedback")
-    if st.button("Submit Feedback", key="feedback_btn") and user_feedback.strip():
+    user_feedback_roadmap = st.text_area("Your feedback, votes, or feature ideas (optional)", key="user_feedback_roadmap")
+    if st.button("Submit Feedback", key="feedback_btn_roadmap") and user_feedback_roadmap.strip():
         st.success("Thank you for your feedback! Your ideas help shape PB2S for everyone.")
 
 # --- Knowledge & Creativity Tools ---
@@ -426,12 +428,24 @@ with tab1:
                             if chat_resp.status_code == 200:
                                 ai_reply = chat_resp.json()
                                 st.success("Here's what your AI says:")
+                                
+                                # Extract the text content from the response
+                                response_text = ai_reply.get('text', str(ai_reply))
+                                
                                 # Show as chat bubble
                                 st.markdown(f"""
 <div style='background:#f0f7ff;padding:1em 1.2em;border-radius:1em;box-shadow:0 1px 4px #e0e0e0;margin-bottom:0.5em;'>
-    <b style='color:#1a1a1a;'>🤖 PB2S:</b> <span style='color:#222;font-size:1.08em;'>{ai_reply.get('response', ai_reply)}</span>
+    <b style='color:#1a1a1a;'>🤖 PB2S:</b> <span style='color:#222;font-size:1.08em;'>{response_text}</span>
 </div>
 """, unsafe_allow_html=True)
+                                
+                                # Show PB2S proof details in an expander
+                                if 'pb2s_proof' in ai_reply:
+                                    proof = ai_reply['pb2s_proof']
+                                    with st.expander("🔍 PB2S Self-Reflection Details"):
+                                        st.write(f"**Decision:** {proof.get('decision', 'N/A')}")
+                                        st.write(f"**Reflection Cycles:** {proof.get('cycles', 0)}")
+                                        st.write(f"**Audit Reference:** {proof.get('audit_ref', 'N/A')}")
                             else:
                                 st.warning(f"Hmm, I couldn't get a response. (Error {chat_resp.status_code})")
                         except Exception as e:
