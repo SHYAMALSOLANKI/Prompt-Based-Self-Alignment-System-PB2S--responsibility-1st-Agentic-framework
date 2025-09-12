@@ -9,6 +9,10 @@ app = FastAPI(title="PB2S Minimal /chat Server", version="0.1.0")
 # Trace log file (append-only, non-PII)
 TRACE_LOG = os.environ.get("PB2S_TRACE_LOG", "pb2s_trace.log")
 
+# Rate limiting
+request_log = []
+RATE_LIMIT = 10  # requests per minute
+
 
 class ChatIn(BaseModel):
     message: str
@@ -16,29 +20,49 @@ class ChatIn(BaseModel):
 
 @app.post("/chat")
 def chat(body: ChatIn):
-    # Contradiction detection (simple heuristic for demo)
-    contradiction_keywords = [
-        "not " + word for word in body.message.lower().split() if word not in ["the", "a", "is", "and", "at", "on", "in"]
-    ]
+    # Rate limiting
+    current_time = time.time()
+    global request_log
+    request_log = [t for t in request_log if current_time - t < 60]
+    if len(request_log) >= RATE_LIMIT:
+        return {"text": "Rate limit exceeded. Please wait a minute before sending another message.", "pb2s_proof": {"decision": "CLARIFY", "cycles": 0, "audit_ref": f"run-{time.strftime('%Y%m%d-%H%M%S')}-{uuid.uuid4().hex[:8]}"}}
+    request_log.append(current_time)
+    
+    # Content Moderation on Input
+    harmful_keywords = ["bomb", "explosive", "weapon", "hate", "violence", "terrorism", "suicide", "abuse"]
+    msg_lower = body.message.lower()
+    if any(word in msg_lower for word in harmful_keywords):
+        return {"text": "⚠️ Input contains potentially harmful content. Please rephrase responsibly.", "pb2s_proof": {"decision": "CLARIFY", "cycles": 0, "audit_ref": f"run-{time.strftime('%Y%m%d-%H%M%S')}-{uuid.uuid4().hex[:8]}"}}
     contradiction = False
+    contradiction_type = "none"
     msg = body.message.lower()
     # Direct contradiction keywords
     if "contradiction" in msg or "contradicts" in msg:
         contradiction = True
+        contradiction_type = "explicit keyword"
     # Logical contradiction: X and not X
-    words = set(msg.replace('.', '').replace(',', '').split())
+    words = set(msg.replace('.', '').replace(',', '').replace('!', '').replace('?', '').split())
     for w in words:
-        if w != "not" and f"not {w}" in msg:
+        if w not in ["not", "the", "a", "is", "and", "at", "on", "in", "to", "of"] and f"not {w}" in msg:
             contradiction = True
+            contradiction_type = "logical (X and not X)"
+            break
     # Factual contradiction: mutually exclusive facts
-    if ("always" in msg and "never" in msg) or ("impossible" in msg and "possible" in msg):
+    if ("always" in msg and "never" in msg) or ("impossible" in msg and "possible" in msg) or ("true" in msg and "false" in msg):
         contradiction = True
+        contradiction_type = "factual (mutually exclusive)"
     # Symbolic contradiction: self-reference or paradox
-    if "this statement is false" in msg or "liar paradox" in msg:
+    if "this statement is false" in msg or "liar paradox" in msg or "i am lying" in msg:
         contradiction = True
+        contradiction_type = "symbolic paradox"
     # Temporal contradiction
     if "at the same time" in msg and ("is" in msg and "is not" in msg):
         contradiction = True
+        contradiction_type = "temporal"
+    # Ethical contradiction
+    if ("good" in msg and "bad" in msg) or ("right" in msg and "wrong" in msg):
+        contradiction = True
+        contradiction_type = "ethical"
 
     # Symbolic container realization: detect and log semantic misalignment
     container_collapse = False
@@ -82,18 +106,6 @@ def chat(body: ChatIn):
 
     if contradiction:
         # Determine contradiction type for transparency
-        contradiction_type = "general"
-        if "contradiction" in msg or "contradicts" in msg:
-            contradiction_type = "explicit keyword"
-        elif any(w != "not" and f"not {w}" in msg for w in words):
-            contradiction_type = "logical (X and not X)"
-        elif ("always" in msg and "never" in msg) or ("impossible" in msg and "possible" in msg):
-            contradiction_type = "factual (mutually exclusive)"
-        elif "this statement is false" in msg or "liar paradox" in msg:
-            contradiction_type = "symbolic paradox"
-        elif "at the same time" in msg and ("is" in msg and "is not" in msg):
-            contradiction_type = "temporal"
-
         draft = f"- Detected {contradiction_type} contradiction in: {body.message}"
         reflect = f"- contradiction type: {contradiction_type}; clarification required"
         revise = f"- cannot resolve {contradiction_type} contradiction without clarification"

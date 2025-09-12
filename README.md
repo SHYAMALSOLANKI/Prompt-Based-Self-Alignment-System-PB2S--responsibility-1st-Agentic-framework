@@ -58,6 +58,8 @@ A responsibility‑first, introspective method for **real‑time, contradiction�
 - [Related Research & Docs](#related-research--docs)
 - [FAQ](#faq)
 - [License](#license)
+- [Conversation History](#conversation-history)
+- [Gap Analysis: Self-Harming Behavior](#gap-analysis-self-harming-behavior)
 - [Acknowledgments](#acknowledgments)
 
 ---
@@ -286,6 +288,16 @@ Keep research claims out of the main README; reference them here and reproduce a
 - **Responsible‑Use Guidelines (non‑binding):** `/LEGAL/RESPONSIBLE_USE.md` — EU‑friendly guidance without restricting legitimate use.
 
 > The four-step structure and conformance suite are normative for **structure‑compliant** claims, whether or not the name “PB2S” is used.
+
+---
+
+## Conversation History
+For a detailed summary of the development conversation, including objectives, technical foundations, codebase status, problem resolution, progress tracking, and continuation plans, see [`docs/conversation_summary.md`](docs/conversation_summary.md).
+
+---
+
+## Gap Analysis: Self-Harming Behavior
+For a comprehensive gap analysis on potential self-harming behavior in the AI system, including identified risks, scenarios, and improvement recommendations, see [`docs/gap_analysis_self_harming_behavior.md`](docs/gap_analysis_self_harming_behavior.md).
 
 ---
 
