@@ -1,29 +1,103 @@
-# --- Feature Roadmap & Feedback ---
+#!/usr/bin/env python3
+"""
+PB2S Dashboard - Streamlit web interface for the PB2S system
+"""
+
+import streamlit as st
+import requests
+import os
+import json
+import base64
+from gtts import gTTS
+from io import BytesIO
+
+# --- Page Configuration ---
+st.set_page_config(page_title="PB2S Node Dashboard", layout="centered")
+
+# --- CSS Styling ---
 st.markdown("""
-<hr style='margin:2em 0 1em 0;'>
-<h2>🚀 Feature Roadmap & Collaboration</h2>
-<span style='font-size:1.08em;'>PB2S is a living, collaborative project. Here are upcoming features you can help shape:</span>
-<ul style='font-size:1.05em;'>
-    <li>🧠 <b>Conversational Memory & Context</b>: Smarter, context-aware chat sessions</li>
-    <li>🎤 <b>Voice Input (Speech-to-Text)</b>: Talk to PB2S using your voice</li>
-    <li>📄 <b>File Upload & Analysis</b>: Summarize, translate, or ask about your documents</li>
-    <li>💻 <b>Code Generation & Execution</b>: Get code snippets, run Python, visualize data</li>
-    <li>📚 <b>Personal Knowledge Base</b>: Add your own notes and facts for PB2S to use</li>
-    <li>🖼️ <b>Multi-modal Output</b>: Combine text, images, and audio in responses</li>
-    <li>🔌 <b>Open Plugin System</b>: Add your own APIs or plugins</li>
-    <li>🌍 <b>Accessibility & Internationalization</b>: Screen reader, high-contrast, easy language switch</li>
-    <li>🔎 <b>Self-Reflection & Transparency</b>: See PB2S's reasoning and confidence</li>
-    <li>🤝 <b>Community & Collaboration</b>: Share creative works, prompts, and responses</li>
-</ul>
-<br>
-<b>What would you like to see first?</b> Use the feedback box below to vote, suggest, or comment!
+<style>
+.stTextInput>div>div>input {font-size: 1.1rem;}
+.stButton>button {font-size: 1.1rem; background-color: #4CAF50; color: white; border-radius: 6px;}
+.stMarkdown {font-size: 1.05rem;}
+</style>
 """, unsafe_allow_html=True)
 
-user_feedback = st.text_area("Your feedback, votes, or feature ideas (optional)", key="user_feedback")
-if st.button("Submit Feedback", key="feedback_btn") and user_feedback.strip():
-        st.success("Thank you for your feedback! Your ideas help shape PB2S for everyone.")
+# --- Friendly AI Avatar and Greeting ---
+st.markdown("""
+<div style='display: flex; align-items: center; gap: 1.2em;'>
+    <img src='https://img.icons8.com/color/96/robot-2.png' width='64' style='border-radius: 50%; box-shadow: 0 2px 8px #ccc;'>
+    <div>
+        <h1 style='margin-bottom: 0.2em;'>Hi, I'm PB2S Assistant!</h1>
+        <span style='font-size:1.1em;'>Ready to help you run, explore, and chat with your distributed AI system. 😊</span>
+    </div>
+</div>
+<br>
+""", unsafe_allow_html=True)
+
+# --- User Instructions ---
+st.markdown("""
+Welcome! This dashboard is your friendly control center for PB2S. Here's what you can do:
+• <b>Check if your AI brains are online</b> (main and edge nodes)<br>
+• <b>Chat with your AI</b>—ask questions, get help, or just say hi!<br>
+• <b>Grow your system</b> by adding more nodes anytime
+<br>
+<b>How to use:</b>
+1. Make sure your PB2S server is running (see below).
+2. Type anything you want to ask or say—don't be shy!
+3. Click <b>Send</b> and watch your AI respond like a helpful teammate.
+4. Add more nodes as your AI family grows!
+<br>
+<b>To start your PB2S server:</b>
+<pre><code>.venv/bin/uvicorn server.main:app --reload --port 8000</code></pre>
+<b>To start this dashboard:</b>
+<pre><code>.venv/bin/streamlit run pb2s_dashboard.py</code></pre>
+""", unsafe_allow_html=True)
+
+# --- Node Configuration ---
+NODES = [
+    {"name": "Main Brain", "url": os.environ.get("PB2S_MAIN_URL", "http://localhost:8000")},
+    # Add more nodes here as needed
+]
+
+# --- Node Status and Chat Interface ---
+for node in NODES:
+    with st.container():
+        st.markdown(f"<h2 style='display:inline'>🧠 {node['name']}</h2>", unsafe_allow_html=True)
+        # Friendly status check
+        try:
+            resp = requests.get(node["url"] + "/chat", timeout=2)
+            st.success(f"Great news! {node['name']} is online and ready to chat at {node['url']}.")
+        except Exception:
+            st.error(f"Oops! {node['name']} at {node['url']} is offline or unreachable. I'll keep checking!")
+        
+        # Conversational chat interface
+        st.markdown("<b>Say something to your AI friend:</b>", unsafe_allow_html=True)
+        prompt = st.text_input(f"What's on your mind? (Ask anything, or just say hi!)", key=node['name'])
+        send_col, resp_col = st.columns([1,3])
+        with send_col:
+            send = st.button(f"💬 Send to {node['name']}", key=node['name']+"_btn")
+        with resp_col:
+            if send and prompt.strip():
+                with st.spinner("Your AI is thinking..."):
+                    try:
+                        chat_resp = requests.post(node["url"] + "/chat", json={"message": prompt})
+                        if chat_resp.status_code == 200:
+                            ai_reply = chat_resp.json()
+                            st.success("Here's what your AI says:")
+                            # Show as chat bubble
+                            st.markdown(f"""
+<div style='background:#f0f7ff;padding:1em 1.2em;border-radius:1em;box-shadow:0 1px 4px #e0e0e0;margin-bottom:0.5em;'>
+    <b style='color:#1a1a1a;'>🤖 PB2S:</b> <span style='color:#222;font-size:1.08em;'>{ai_reply.get('response', ai_reply)}</span>
+</div>
+""", unsafe_allow_html=True)
+                        else:
+                            st.warning(f"Hmm, I couldn't get a response. (Error {chat_resp.status_code})")
+                    except Exception as e:
+                        st.error(f"Sorry, I ran into a problem: {e}")
+        st.markdown("<hr style='margin:1.5em 0;'>", unsafe_allow_html=True)
+
 # --- Knowledge & Creativity Tools ---
-import json
 
 # Wikipedia Summary (using Wikipedia API)
 st.markdown("""
@@ -77,9 +151,6 @@ if st.button("Translate", key="trans_btn") and trans_text.strip():
             st.error(f"Translation error: {e}")
 
 # Text-to-Speech (gTTS, free, copyright-safe)
-from gtts import gTTS
-from io import BytesIO
-
 st.markdown("""
 <hr style='margin:2em 0 1em 0;'>
 <h2>🗣️ Text to Speech</h2>
@@ -98,98 +169,7 @@ if st.button("Speak", key="tts_btn") and tts_text.strip():
         except Exception as e:
             st.error(f"Text-to-speech error: {e}")
 
-import streamlit as st
-import requests
-import os
-
-# --- User Instructions ---
-st.set_page_config(page_title="PB2S Node Dashboard", layout="centered")
-st.markdown("""
-<style>
-.stTextInput>div>div>input {font-size: 1.1rem;}
-.stButton>button {font-size: 1.1rem; background-color: #4CAF50; color: white; border-radius: 6px;}
-.stMarkdown {font-size: 1.05rem;}
-</style>
-""", unsafe_allow_html=True)
-
-
-# --- Friendly AI Avatar and Greeting ---
-st.markdown("""
-<div style='display: flex; align-items: center; gap: 1.2em;'>
-    <img src='https://img.icons8.com/color/96/robot-2.png' width='64' style='border-radius: 50%; box-shadow: 0 2px 8px #ccc;'>
-    <div>
-        <h1 style='margin-bottom: 0.2em;'>Hi, I'm PB2S Assistant!</h1>
-        <span style='font-size:1.1em;'>Ready to help you run, explore, and chat with your distributed AI system. 😊</span>
-    </div>
-</div>
-<br>
-""", unsafe_allow_html=True)
-
-st.markdown("""
-Welcome! This dashboard is your friendly control center for PB2S. Here’s what you can do:
-• <b>Check if your AI brains are online</b> (main and edge nodes)<br>
-• <b>Chat with your AI</b>—ask questions, get help, or just say hi!<br>
-• <b>Grow your system</b> by adding more nodes anytime
-<br>
-<b>How to use:</b>
-1. Make sure your PB2S server is running (see below).
-2. Type anything you want to ask or say—don’t be shy!
-3. Click <b>Send</b> and watch your AI respond like a helpful teammate.
-4. Add more nodes as your AI family grows!
-<br>
-<b>To start your PB2S server:</b>
-<pre><code>.venv/bin/uvicorn server.main:app --reload --port 8000</code></pre>
-<b>To start this dashboard:</b>
-<pre><code>.venv/bin/streamlit run pb2s_dashboard.py</code></pre>
-""", unsafe_allow_html=True)
-
-# --- Node Configuration ---
-NODES = [
-    {"name": "Main Brain", "url": os.environ.get("PB2S_MAIN_URL", "http://localhost:8000")},
-    # Add more nodes here as needed
-]
-
-
-for node in NODES:
-    with st.container():
-        st.markdown(f"<h2 style='display:inline'>🧠 {node['name']}</h2>", unsafe_allow_html=True)
-        # Friendly status check
-        try:
-            resp = requests.get(node["url"] + "/chat", timeout=2)
-            st.success(f"Great news! {node['name']} is online and ready to chat at {node['url']}.")
-        except Exception:
-            st.error(f"Oops! {node['name']} at {node['url']} is offline or unreachable. I'll keep checking!")
-        # Conversational chat interface
-        st.markdown("<b>Say something to your AI friend:</b>", unsafe_allow_html=True)
-        prompt = st.text_input(f"What's on your mind? (Ask anything, or just say hi!)", key=node['name'])
-        send_col, resp_col = st.columns([1,3])
-        with send_col:
-            send = st.button(f"💬 Send to {node['name']}", key=node['name']+"_btn")
-        with resp_col:
-            if send and prompt.strip():
-                with st.spinner("Your AI is thinking..."):
-                    try:
-                        chat_resp = requests.post(node["url"] + "/chat", json={"message": prompt})
-                        if chat_resp.status_code == 200:
-                            ai_reply = chat_resp.json()
-                                                        st.success("Here's what your AI says:")
-                                                        # Show as chat bubble
-                                                        st.markdown(f"""
-<div style='background:#f0f7ff;padding:1em 1.2em;border-radius:1em;box-shadow:0 1px 4px #e0e0e0;margin-bottom:0.5em;'>
-    <b style='color:#1a1a1a;'>🤖 PB2S:</b> <span style='color:#222;font-size:1.08em;'>{ai_reply.get('response', ai_reply)}</span>
-</div>
-""", unsafe_allow_html=True)
-                        else:
-                            st.warning(f"Hmm, I couldn't get a response. (Error {chat_resp.status_code})")
-                    except Exception as e:
-                        st.error(f"Sorry, I ran into a problem: {e}")
-        st.markdown("<hr style='margin:1.5em 0;'>", unsafe_allow_html=True)
-
-
-
 # --- Creative Tools: Image Generation (HuggingFace Stable Diffusion) ---
-import base64
-
 st.markdown("""
 <hr style='margin:2em 0 1em 0;'>
 <h2>🎨 Create with AI: Image Generation</h2>
@@ -219,6 +199,32 @@ if st.button("Generate Image", key="img_btn") and img_prompt.strip():
         except Exception as e:
             st.error(f"Image generation error: {e}")
 
+# --- Feature Roadmap & Feedback ---
+st.markdown("""
+<hr style='margin:2em 0 1em 0;'>
+<h2>🚀 Feature Roadmap & Collaboration</h2>
+<span style='font-size:1.08em;'>PB2S is a living, collaborative project. Here are upcoming features you can help shape:</span>
+<ul style='font-size:1.05em;'>
+    <li>🧠 <b>Conversational Memory & Context</b>: Smarter, context-aware chat sessions</li>
+    <li>🎤 <b>Voice Input (Speech-to-Text)</b>: Talk to PB2S using your voice</li>
+    <li>📄 <b>File Upload & Analysis</b>: Summarize, translate, or ask about your documents</li>
+    <li>💻 <b>Code Generation & Execution</b>: Get code snippets, run Python, visualize data</li>
+    <li>📚 <b>Personal Knowledge Base</b>: Add your own notes and facts for PB2S to use</li>
+    <li>🖼️ <b>Multi-modal Output</b>: Combine text, images, and audio in responses</li>
+    <li>🔌 <b>Open Plugin System</b>: Add your own APIs or plugins</li>
+    <li>🌍 <b>Accessibility & Internationalization</b>: Screen reader, high-contrast, easy language switch</li>
+    <li>🔎 <b>Self-Reflection & Transparency</b>: See PB2S's reasoning and confidence</li>
+    <li>🤝 <b>Community & Collaboration</b>: Share creative works, prompts, and responses</li>
+</ul>
+<br>
+<b>What would you like to see first?</b> Use the feedback box below to vote, suggest, or comment!
+""", unsafe_allow_html=True)
+
+user_feedback = st.text_area("Your feedback, votes, or feature ideas (optional)", key="user_feedback")
+if st.button("Submit Feedback", key="feedback_btn") and user_feedback.strip():
+    st.success("Thank you for your feedback! Your ideas help shape PB2S for everyone.")
+
+# --- Footer Tips ---
 st.markdown("""
 <div style='color:#888;font-size:1.05em;'>
 💡 <b>Tip:</b> You can add more nodes or features anytime. This dashboard is designed to grow with you—and your AI is always happy to chat!
