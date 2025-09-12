@@ -1,3 +1,10 @@
 {"timestamp": "2025-09-11T23:34:38", "topic": "act/approve", "payload": "{\"audit_ref\": \"run-20250911-233438-714b836c\"}", "result": "0"}
 {"timestamp": "2025-09-11T23:54:55", "topic": "act/approve", "payload": "{\"audit_ref\": \"run-20250911-235455-a9d79299\"}", "result": "0"}
 {"timestamp": "2025-09-11T23:55:07", "topic": "act/approve", "payload": "{\"audit_ref\": \"run-20250911-235507-ae11616b\"}", "result": "0"}
+{"timestamp": "2025-09-12T06:13:02", "error": "[WinError 10061] No connection could be made because the target machine actively refused it"}
+{"timestamp": "2025-09-12T06:15:32", "error": "[WinError 10061] No connection could be made because the target machine actively refused it"}
+{"timestamp": "2025-09-12T06:15:52", "error": "[WinError 10061] No connection could be made because the target machine actively refused it"}
+{"timestamp": "2025-09-12T06:19:41", "error": "[WinError 10061] No connection could be made because the target machine actively refused it"}
+{"timestamp": "2025-09-12T06:23:30", "error": "[WinError 10061] No connection could be made because the target machine actively refused it"}
+{"timestamp": "2025-09-12T06:41:07", "error": "[WinError 10061] No connection could be made because the target machine actively refused it"}
+{"timestamp": "2025-09-12T06:42:09", "error": "[WinError 10061] No connection could be made because the target machine actively refused it"}
