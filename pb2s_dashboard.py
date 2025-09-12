@@ -1,3 +1,102 @@
+# --- Feature Roadmap & Feedback ---
+st.markdown("""
+<hr style='margin:2em 0 1em 0;'>
+<h2>🚀 Feature Roadmap & Collaboration</h2>
+<span style='font-size:1.08em;'>PB2S is a living, collaborative project. Here are upcoming features you can help shape:</span>
+<ul style='font-size:1.05em;'>
+    <li>🧠 <b>Conversational Memory & Context</b>: Smarter, context-aware chat sessions</li>
+    <li>🎤 <b>Voice Input (Speech-to-Text)</b>: Talk to PB2S using your voice</li>
+    <li>📄 <b>File Upload & Analysis</b>: Summarize, translate, or ask about your documents</li>
+    <li>💻 <b>Code Generation & Execution</b>: Get code snippets, run Python, visualize data</li>
+    <li>📚 <b>Personal Knowledge Base</b>: Add your own notes and facts for PB2S to use</li>
+    <li>🖼️ <b>Multi-modal Output</b>: Combine text, images, and audio in responses</li>
+    <li>🔌 <b>Open Plugin System</b>: Add your own APIs or plugins</li>
+    <li>🌍 <b>Accessibility & Internationalization</b>: Screen reader, high-contrast, easy language switch</li>
+    <li>🔎 <b>Self-Reflection & Transparency</b>: See PB2S's reasoning and confidence</li>
+    <li>🤝 <b>Community & Collaboration</b>: Share creative works, prompts, and responses</li>
+</ul>
+<br>
+<b>What would you like to see first?</b> Use the feedback box below to vote, suggest, or comment!
+""", unsafe_allow_html=True)
+
+user_feedback = st.text_area("Your feedback, votes, or feature ideas (optional)", key="user_feedback")
+if st.button("Submit Feedback", key="feedback_btn") and user_feedback.strip():
+        st.success("Thank you for your feedback! Your ideas help shape PB2S for everyone.")
+# --- Knowledge & Creativity Tools ---
+import json
+
+# Wikipedia Summary (using Wikipedia API)
+st.markdown("""
+<hr style='margin:2em 0 1em 0;'>
+<h2>📚 Ask Wikipedia</h2>
+<span style='font-size:1.08em;'>Type any topic, and PB2S will fetch a summary from Wikipedia (free, copyright-safe).</span>
+""", unsafe_allow_html=True)
+wiki_query = st.text_input("Wikipedia topic (e.g. Alan Turing, Quantum Computing)", key="wiki_query")
+if st.button("Search Wikipedia", key="wiki_btn") and wiki_query.strip():
+    with st.spinner("Searching Wikipedia..."):
+        try:
+            url = f"https://en.wikipedia.org/api/rest_v1/page/summary/{wiki_query.strip().replace(' ', '_')}"
+            resp = requests.get(url, timeout=10)
+            if resp.status_code == 200:
+                data = resp.json()
+                st.markdown(f"<b>{data.get('title','')}</b><br>{data.get('extract','No summary found.')}", unsafe_allow_html=True)
+                if data.get('thumbnail'):
+                    st.image(data['thumbnail']['source'], width=200)
+            else:
+                st.warning("No summary found. Try another topic.")
+        except Exception as e:
+            st.error(f"Wikipedia error: {e}")
+
+# Translation (LibreTranslate, free endpoint)
+st.markdown("""
+<hr style='margin:2em 0 1em 0;'>
+<h2>🌐 Translate Anything</h2>
+<span style='font-size:1.08em;'>Translate text between languages using LibreTranslate (no API key needed, open/free endpoint).</span>
+""", unsafe_allow_html=True)
+trans_text = st.text_input("Text to translate", key="trans_text")
+lang_options = {"English":"en", "Hindi":"hi", "Spanish":"es", "French":"fr", "German":"de", "Chinese":"zh"}
+col1, col2 = st.columns(2)
+with col1:
+    src_lang = st.selectbox("From", list(lang_options.keys()), key="src_lang")
+with col2:
+    tgt_lang = st.selectbox("To", list(lang_options.keys()), index=1, key="tgt_lang")
+if st.button("Translate", key="trans_btn") and trans_text.strip():
+    with st.spinner("Translating..."):
+        try:
+            resp = requests.post("https://libretranslate.de/translate", json={
+                "q": trans_text,
+                "source": lang_options[src_lang],
+                "target": lang_options[tgt_lang],
+                "format": "text"
+            }, timeout=10)
+            if resp.status_code == 200:
+                st.success(resp.json().get("translatedText", "No translation returned."))
+            else:
+                st.warning("Translation failed.")
+        except Exception as e:
+            st.error(f"Translation error: {e}")
+
+# Text-to-Speech (gTTS, free, copyright-safe)
+from gtts import gTTS
+from io import BytesIO
+
+st.markdown("""
+<hr style='margin:2em 0 1em 0;'>
+<h2>🗣️ Text to Speech</h2>
+<span style='font-size:1.08em;'>Let PB2S read anything aloud using free Google Text-to-Speech (gTTS, copyright-safe for personal use).</span>
+""", unsafe_allow_html=True)
+tts_text = st.text_input("Text to speak", key="tts_text")
+tts_lang = st.selectbox("Language", ["en", "hi", "es", "fr", "de", "zh"], key="tts_lang")
+if st.button("Speak", key="tts_btn") and tts_text.strip():
+    with st.spinner("Synthesizing speech..."):
+        try:
+            tts = gTTS(text=tts_text, lang=tts_lang)
+            fp = BytesIO()
+            tts.write_to_fp(fp)
+            fp.seek(0)
+            st.audio(fp.read(), format='audio/mp3')
+        except Exception as e:
+            st.error(f"Text-to-speech error: {e}")
 
 import streamlit as st
 import requests
@@ -73,7 +172,7 @@ for node in NODES:
                         chat_resp = requests.post(node["url"] + "/chat", json={"message": prompt})
                         if chat_resp.status_code == 200:
                             ai_reply = chat_resp.json()
-                            st.success("Here's what your AI says:")
+                                                        st.success("Here's what your AI says:")
                                                         # Show as chat bubble
                                                         st.markdown(f"""
 <div style='background:#f0f7ff;padding:1em 1.2em;border-radius:1em;box-shadow:0 1px 4px #e0e0e0;margin-bottom:0.5em;'>

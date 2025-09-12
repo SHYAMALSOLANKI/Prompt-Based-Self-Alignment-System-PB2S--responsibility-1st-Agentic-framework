@@ -1,3 +1,4 @@
+gTTS
 # For MQTT acceptance tests
 paho-mqtt
 fastapi
