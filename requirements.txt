@@ -7,3 +7,4 @@ pydantic
 httpx
 jsonschema
 python-dotenv
+streamlit
