@@ -1,315 +1,35 @@
-import streamlit as st
+# Fix for Streamlit metadata issues in PyInstaller
+try:
+    import streamlit_fix_hook
+except ImportError:
+    pass
 
-# --- Feature Roadmap & Feedback ---
-st.markdown("""
-<hr style='margin:2em 0 1em 0;'>
-<h2>🚀 Feature Roadmap & Collaboration</h2>
-<span style='font-size:1.08em;'>PB2S is a living, collaborative project. Here are upcoming features you can help shape:</span>
-<ul style='font-size:1.05em;'>
-    <li>🧠 <b>Conversational Memory & Context</b>: Smarter, context-aware chat sessions</li>
-    <li>🎤 <b>Voice Input (Speech-to-Text)</b>: Talk to PB2S using your voice</li>
-    <li>📄 <b>File Upload & Analysis</b>: Summarize, translate, or ask about your documents</li>
-    <li>💻 <b>Code Generation & Execution</b>: Get code snippets, run Python, visualize data</li>
-    <li>📚 <b>Personal Knowledge Base</b>: Add your own notes and facts for PB2S to use</li>
-    <li>🖼️ <b>Multi-modal Output</b>: Combine text, images, and audio in responses</li>
-    <li>🔌 <b>Open Plugin System</b>: Add your own APIs or plugins</li>
-    <li>🌍 <b>Accessibility & Internationalization</b>: Screen reader, high-contrast, easy language switch</li>
-    <li>🔎 <b>Self-Reflection & Transparency</b>: See PB2S's reasoning and confidence</li>
-    <li>🤝 <b>Community & Collaboration</b>: Share creative works, prompts, and responses</li>
-</ul>
-<br>
-<b>What would you like to see first?</b> Use the feedback box below to vote, suggest, or comment!
-""", unsafe_allow_html=True)
-
-user_feedback = st.text_area("Your feedback, votes, or feature ideas (optional)", key="user_feedback")
-if st.button("Submit Feedback", key="feedback_btn") and user_feedback.strip():
-        st.success("Thank you for your feedback! Your ideas help shape PB2S for everyone.")
-
-# --- Main Navigation Tabs ---
-tab1, tab2, tab3, tab4 = st.tabs(["💬 Chat & Nodes", "🛠️ Knowledge Tools", "🎨 Creativity Hub", "🚀 Roadmap & Feedback"])
-
-with tab1:
-    st.markdown("### 🧠 Chat with Your AI Nodes")
-    # Node Configuration and Chat code here (will move existing chat code)
-
-with tab2:
-    st.markdown("### 📚 Knowledge & Utility Tools")
-    # Tools like Wikipedia, Translation, News, etc.
-
-with tab3:
-    st.markdown("### 🎨 Create & Explore")
-    # Image generation, TTS, etc.
-
-with tab4:
-    st.markdown("### 🚀 Roadmap & Collaboration")
-    st.markdown("""
-    <span style='font-size:1.08em;'>PB2S is a living, collaborative project. Here are upcoming features you can help shape:</span>
-    <ul style='font-size:1.05em;'>
-        <li>🧠 <b>Conversational Memory & Context</b>: Smarter, context-aware chat sessions</li>
-        <li>🎤 <b>Voice Input (Speech-to-Text)</b>: Talk to PB2S using your voice</li>
-        <li>📄 <b>File Upload & Analysis</b>: Summarize, translate, or ask about your documents</li>
-        <li>💻 <b>Code Generation & Execution</b>: Get code snippets, run Python, visualize data</li>
-        <li>📚 <b>Personal Knowledge Base</b>: Add your own notes and facts for PB2S to use</li>
-        <li>🖼️ <b>Multi-modal Output</b>: Combine text, images, and audio in responses</li>
-        <li>🔌 <b>Open Plugin System</b>: Add your own APIs or plugins</li>
-        <li>🌍 <b>Accessibility & Internationalization</b>: Screen reader, high-contrast, easy language switch</li>
-        <li>🔎 <b>Self-Reflection & Transparency</b>: See PB2S's reasoning and confidence</li>
-        <li>🤝 <b>Community & Collaboration</b>: Share creative works, prompts, and responses</li>
-    </ul>
-    <br>
-    <b>What would you like to see first?</b> Use the feedback box below to vote, suggest, or comment!
-    """, unsafe_allow_html=True)
-    user_feedback_roadmap = st.text_area("Your feedback, votes, or feature ideas (optional)", key="user_feedback_roadmap")
-    if st.button("Submit Feedback", key="feedback_btn_roadmap") and user_feedback_roadmap.strip():
-        st.success("Thank you for your feedback! Your ideas help shape PB2S for everyone.")
-
-# --- Knowledge & Creativity Tools ---
-import json
-
-with tab2:
-    # Wikipedia Summary (using Wikipedia API)
-    st.markdown("""
-    <hr style='margin:2em 0 1em 0;'>
-    <h2>📚 Ask Wikipedia</h2>
-    <span style='font-size:1.08em;'>Type any topic, and PB2S will fetch a summary from Wikipedia (free, copyright-safe). <b>Note:</b> Educational and factual content is preserved; only explicit NSFW material is moderated.</span>
-    """, unsafe_allow_html=True)
-    wiki_query = st.text_input("Wikipedia topic (e.g. Alan Turing, Quantum Computing)", key="wiki_query")
-    if st.button("Search Wikipedia", key="wiki_btn") and wiki_query.strip():
-        with st.spinner("Searching Wikipedia..."):
-            try:
-                url = f"https://en.wikipedia.org/api/rest_v1/page/summary/{wiki_query.strip().replace(' ', '_')}"
-                resp = requests.get(url, timeout=10)
-                if resp.status_code == 200:
-                    data = resp.json()
-                    extract = data.get('extract','No summary found.')
-                    warning = moderate_content(extract, "Wikipedia summary")
-                    if warning:
-                        st.warning(warning)
-                    st.markdown(f"<b>{data.get('title','')}</b><br>{extract}", unsafe_allow_html=True)
-                    if data.get('thumbnail'):
-                        st.image(data['thumbnail']['source'], width=200)
-                else:
-                    st.warning("No summary found. Try another topic.")
-            except Exception as e:
-                st.error(f"Wikipedia error: {e}")
-
-    # Translation (LibreTranslate, free endpoint)
-    st.markdown("""
-    <hr style='margin:2em 0 1em 0;'>
-    <h2>🌐 Translate Anything</h2>
-    <span style='font-size:1.08em;'>Translate text between languages using LibreTranslate (no API key needed, open/free endpoint). <b>Note:</b> Preserves all content except explicit NSFW material.</span>
-    """, unsafe_allow_html=True)
-    trans_text = st.text_input("Text to translate", key="trans_text")
-    lang_options = {"English":"en", "Hindi":"hi", "Spanish":"es", "French":"fr", "German":"de", "Chinese":"zh"}
-    col1, col2 = st.columns(2)
-    with col1:
-        src_lang = st.selectbox("From", list(lang_options.keys()), key="src_lang")
-    with col2:
-        tgt_lang = st.selectbox("To", list(lang_options.keys()), index=1, key="tgt_lang")
-    if st.button("Translate", key="trans_btn") and trans_text.strip():
-        with st.spinner("Translating..."):
-            try:
-                resp = requests.post("https://libretranslate.de/translate", json={
-                    "q": trans_text,
-                    "source": lang_options[src_lang],
-                    "target": lang_options[tgt_lang],
-                    "format": "text"
-                }, timeout=10)
-                if resp.status_code == 200:
-                    translated = resp.json().get("translatedText", "No translation returned.")
-                    warning = moderate_content(translated, "translation")
-                    if warning:
-                        st.warning(warning)
-                    st.success(translated)
-                else:
-                    st.warning("Translation failed.")
-            except Exception as e:
-                st.error(f"Translation error: {e}")
-
-    # Add more tools here: News, Dictionary, Calculator, etc.
-
-    # News Headlines (using free NewsAPI, note: free tier has limits)
-    st.markdown("""
-    <hr style='margin:2em 0 1em 0;'>
-    <h2>📰 Latest News Headlines</h2>
-    <span style='font-size:1.08em;'>Get top news headlines from around the world (free, courtesy of NewsAPI). <b>Note:</b> News content is preserved; only explicit NSFW material is moderated.</span>
-    """, unsafe_allow_html=True)
-    news_country = st.selectbox("Country", ["us", "in", "gb", "ca", "au"], key="news_country")
-    if st.button("Get News", key="news_btn"):
-        with st.spinner("Fetching news..."):
-            try:
-                # Note: Replace with your free API key if needed, or use a keyless endpoint
-                api_key = "your_free_newsapi_key_here"  # Get from newsapi.org (free tier available)
-                url = f"https://newsapi.org/v2/top-headlines?country={news_country}&apiKey={api_key}"
-                resp = requests.get(url, timeout=10)
-                if resp.status_code == 200:
-                    data = resp.json()
-                    for article in data.get('articles', [])[:5]:  # Show top 5
-                        title = article['title']
-                        desc = article.get('description','')
-                        warning = moderate_content(title + " " + desc, "news article")
-                        if warning:
-                            st.warning(warning)
-                        st.markdown(f"<b>{title}</b><br>{desc}<br><a href='{article['url']}' target='_blank'>Read more</a>", unsafe_allow_html=True)
-                        st.markdown("---")
-                else:
-                    st.warning("News fetch failed. Check API key or try later.")
-            except Exception as e:
-                st.error(f"News error: {e}")
-
-    # Dictionary Lookup (free API)
-    st.markdown("""
-    <hr style='margin:2em 0 1em 0;'>
-    <h2>📖 Dictionary Lookup</h2>
-    <span style='font-size:1.08em;'>Look up word definitions, synonyms, and more (free, using Dictionary API).</span>
-    """, unsafe_allow_html=True)
-    dict_word = st.text_input("Enter a word", key="dict_word")
-    if st.button("Lookup", key="dict_btn") and dict_word.strip():
-        with st.spinner("Looking up..."):
-            try:
-                url = f"https://api.dictionaryapi.dev/api/v2/entries/en/{dict_word.strip()}"
-                resp = requests.get(url, timeout=10)
-                if resp.status_code == 200:
-                    data = resp.json()
-                    if data:
-                        entry = data[0]
-                        st.markdown(f"<b>{entry['word']}</b>", unsafe_allow_html=True)
-                        for meaning in entry.get('meanings', []):
-                            definition = meaning['definitions'][0]['definition']
-                            warning = moderate_content(definition, "definition")
-                            if warning:
-                                st.warning(warning)
-                            st.markdown(f"<i>{meaning['partOfSpeech']}</i>: {definition}", unsafe_allow_html=True)
-                    else:
-                        st.warning("Word not found.")
-                else:
-                    st.warning("Lookup failed.")
-            except Exception as e:
-                st.error(f"Dictionary error: {e}")
-
-    # Simple Calculator
-    st.markdown("""
-    <hr style='margin:2em 0 1em 0;'>
-    <h2>🧮 Simple Calculator</h2>
-    <span style='font-size:1.08em;'>Calculate expressions safely (e.g. 2+2*3).</span>
-    """, unsafe_allow_html=True)
-    calc_expr = st.text_input("Enter expression", key="calc_expr")
-    if st.button("Calculate", key="calc_btn") and calc_expr.strip():
-        warning = moderate_content(calc_expr, "expression")
-        if warning:
-            st.warning(warning)
-        try:
-            # Safe eval with limited globals
-            result = eval(calc_expr, {"__builtins__": None}, {})
-            st.success(f"Result: {result}")
-        except Exception as e:
-            st.error(f"Calculation error: {e}")
-
-    # Time Zone Converter (free API)
-    st.markdown("""
-    <hr style='margin:2em 0 1em 0;'>
-    <h2>🕒 Time Zone Converter</h2>
-    <span style='font-size:1.08em;'>Convert time between zones (free, using WorldTimeAPI).</span>
-    """, unsafe_allow_html=True)
-    tz_from = st.selectbox("From Time Zone", ["America/New_York", "Europe/London", "Asia/Kolkata", "Australia/Sydney"], key="tz_from")
-    tz_to = st.selectbox("To Time Zone", ["America/New_York", "Europe/London", "Asia/Kolkata", "Australia/Sydney"], index=1, key="tz_to")
-    if st.button("Convert", key="tz_btn"):
-        with st.spinner("Converting..."):
-            try:
-                # Get current time in from zone
-                url = f"http://worldtimeapi.org/api/timezone/{tz_from}"
-                resp = requests.get(url, timeout=10)
-                if resp.status_code == 200:
-                    from_time = resp.json()['datetime']
-                    # Convert to to zone
-                    url2 = f"http://worldtimeapi.org/api/timezone/{tz_to}"
-                    resp2 = requests.get(url2, timeout=10)
-                    if resp2.status_code == 200:
-                        to_time = resp2.json()['datetime']
-                        st.success(f"From {tz_from}: {from_time}<br>To {tz_to}: {to_time}", unsafe_allow_html=True)
-                    else:
-                        st.warning("Conversion failed.")
-                else:
-                    st.warning("Time fetch failed.")
-            except Exception as e:
-                st.error(f"Time error: {e}")
-
-    # File Upload & Analysis
-    st.markdown("""
-    <hr style='margin:2em 0 1em 0;'>
-    <h2>📄 File Upload & Analysis</h2>
-    <span style='font-size:1.08em;'>Upload a text file for basic analysis (word count, summary preview).</span>
-    """, unsafe_allow_html=True)
-    uploaded_file = st.file_uploader("Choose a text file", type=["txt"], key="file_upload")
-    if uploaded_file is not None:
-        text = uploaded_file.read().decode("utf-8")
-        warning = moderate_content(text, "uploaded file")
-        if warning:
-            st.warning(warning)
-        word_count = len(text.split())
-        st.markdown(f"<b>Word Count:</b> {word_count}", unsafe_allow_html=True)
-        st.markdown(f"<b>Preview:</b> {text[:500]}...", unsafe_allow_html=True)
-        if st.button("Summarize (Basic)", key="summarize_btn"):
-            summary = text[:200] + "..." if len(text) > 200 else text
-            st.success(f"Basic Summary: {summary}")
-
-with tab3:
-    # Text-to-Speech (gTTS, free, copyright-safe)
-    st.markdown("""
-    <hr style='margin:2em 0 1em 0;'>
-    <h2>🗣️ Text to Speech</h2>
-    <span style='font-size:1.08em;'>Let PB2S read anything aloud using free Google Text-to-Speech (gTTS, copyright-safe for personal use).</span>
-    """, unsafe_allow_html=True)
-    tts_text = st.text_input("Text to speak", key="tts_text")
-    tts_lang = st.selectbox("Language", ["en", "hi", "es", "fr", "de", "zh"], key="tts_lang")
-    if st.button("Speak", key="tts_btn") and tts_text.strip():
-        with st.spinner("Synthesizing speech..."):
-            try:
-                from gtts import gTTS
-                from io import BytesIO
-                tts = gTTS(text=tts_text, lang=tts_lang)
-                fp = BytesIO()
-                tts.write_to_fp(fp)
-                fp.seek(0)
-                st.audio(fp.read(), format='audio/mp3')
-            except Exception as e:
-                st.error(f"Text-to-speech error: {e}")
-
-    # Creative Tools: Image Generation (HuggingFace Stable Diffusion)
-    st.markdown("""
-    <hr style='margin:2em 0 1em 0;'>
-    <h2>🎨 Create with AI: Image Generation</h2>
-    <span style='font-size:1.08em;'>Describe anything, and PB2S will paint it for you using open-source AI (Stable Diffusion via HuggingFace). No login or key required.</span>
-    """, unsafe_allow_html=True)
-
-    img_prompt = st.text_input("What image should I create for you? (Describe in detail)", key="img_prompt")
-    if st.button("Generate Image", key="img_btn") and img_prompt.strip():
-        with st.spinner("Painting your imagination with AI..."):
-            try:
-                import base64
-                api_url = "https://api-inference.huggingface.co/models/stabilityai/stable-diffusion-2"
-                headers = {"accept": "application/json"}
-                payload = {"inputs": img_prompt}
-                resp = requests.post(api_url, headers=headers, json=payload, timeout=60)
-                if resp.status_code == 200 and resp.headers.get('content-type','').startswith('image'):
-                    st.image(resp.content, caption=f"AI Art: {img_prompt}", use_column_width=True)
-                elif resp.status_code == 200 and resp.headers.get('content-type','').startswith('application/json'):
-                    # Some endpoints return base64 in JSON
-                    data = resp.json()
-                    if 'data' in data and isinstance(data['data'], list) and 'b64_json' in data['data'][0]:
-                        img_data = base64.b64decode(data['data'][0]['b64_json'])
-                        st.image(img_data, caption=f"AI Art: {img_prompt}", use_column_width=True)
-                    else:
-                        st.warning("No image returned. Try a different prompt.")
-                else:
-                    st.warning(f"Image generation failed: {resp.status_code}")
-            except Exception as e:
-                st.error(f"Image generation error: {e}")
-
-# --- Node Configuration and Chat ---
 import streamlit as st
 import requests
 import os
+import base64
+
+# Import KoboldAI CPP, llama.cpp and LM Studio connectors
+try:
+    from kobold_connector import KoboldAICPPConnector
+    KOBOLD_AVAILABLE = True
+except ImportError:
+    KOBOLD_AVAILABLE = False
+    print("⚠️  KoboldAI connector not available")
+
+try:
+    from llama_cpp_connector import LlamaCPPConnector
+    LLAMA_CPP_AVAILABLE = True
+except ImportError:
+    LLAMA_CPP_AVAILABLE = False
+    print("⚠️  llama.cpp connector not available")
+
+try:
+    from lmstudio_connector import LMStudioConnector
+    LMSTUDIO_AVAILABLE = True
+except ImportError:
+    LMSTUDIO_AVAILABLE = False
+    print("⚠️  LM Studio connector not available")
 
 # Content Moderation Function - Focus on NSFW content harmful for under 18
 def moderate_content(text, source="general"):
@@ -341,119 +61,409 @@ def moderate_content(text, source="general"):
     
     return None
 
-# --- User Instructions ---
-st.set_page_config(page_title="PB2S Node Dashboard", layout="centered")
-st.markdown("""
-<style>
-.stTextInput>div>div>input {font-size: 1.1rem;}
-.stButton>button {font-size: 1.1rem; background-color: #4CAF50; color: white; border-radius: 6px;}
-.stMarkdown {font-size: 1.05rem;}
-</style>
-""", unsafe_allow_html=True)
+# Page configuration
+st.set_page_config(
+    page_title="PB2S Dashboard", 
+    page_icon="🧠", 
+    layout="wide",
+    initial_sidebar_state="expanded"
+)
 
-
-# --- Friendly AI Avatar and Greeting ---
+# Header
 st.markdown("""
-<div style='display: flex; align-items: center; gap: 1.2em;'>
-    <img src='https://img.icons8.com/color/96/robot-2.png' width='64' style='border-radius: 50%; box-shadow: 0 2px 8px #ccc;'>
-    <div>
-        <h1 style='margin-bottom: 0.2em;'>Hi, I'm PB2S Assistant!</h1>
-        <span style='font-size:1.1em;'>Ready to help you run, explore, and chat with your distributed AI system. 😊</span>
-    </div>
+<div style='text-align: center; padding: 1rem 0; background: linear-gradient(90deg, #667eea 0%, #764ba2 100%); color: white; border-radius: 10px; margin-bottom: 2rem;'>
+    <h1 style='margin: 0; font-size: 2.5rem;'>🧠 PB2S Dashboard</h1>
+    <p style='margin: 0; font-size: 1.2rem; opacity: 0.9;'>Prompt-Based Self-Alignment System</p>
 </div>
-<br>
 """, unsafe_allow_html=True)
 
-st.markdown("""
-Welcome! This dashboard is your friendly control center for PB2S. Here’s what you can do:
-• <b>Check if your AI brains are online</b> (main and edge nodes)<br>
-• <b>Chat with your AI</b>—ask questions, get help, or just say hi!<br>
-• <b>Grow your system</b> by adding more nodes anytime
-<br>
-<b>How to use:</b>
-1. Make sure your PB2S server is running (see below).
-2. Type anything you want to ask or say—don’t be shy!
-3. Click <b>Send</b> and watch your AI respond like a helpful teammate.
-4. Add more nodes as your AI family grows!
-<br>
-<b>To start your PB2S server:</b>
-<pre><code>.venv/bin/uvicorn server.main:app --reload --port 8000</code></pre>
-<b>To start this dashboard:</b>
-<pre><code>.venv/bin/streamlit run pb2s_dashboard.py</code></pre>
-""", unsafe_allow_html=True)
-
-# --- Node Configuration ---
-NODES = [
-    {"name": "Main Brain", "url": os.environ.get("PB2S_MAIN_URL", "http://localhost:8000")},
-    # Add more nodes here as needed
-]
+# Main Navigation Tabs
+tab1, tab2, tab3, tab4 = st.tabs(["💬 Chat & Nodes", "🛠️ Knowledge Tools", "🎨 Creativity Hub", "🚀 Roadmap & Feedback"])
 
 with tab1:
-    for node in NODES:
-        with st.container():
-            st.markdown(f"<h2 style='display:inline'>🧠 {node['name']}</h2>", unsafe_allow_html=True)
-            # Friendly status check
+    st.markdown("### 🧠 Chat with Your AI Nodes")
+    
+    # User Instructions
+    st.markdown("""
+    <div style='background:#e8f4f8;padding:1em;border-radius:0.5em;margin-bottom:1em;'>
+        <b>💡 How to use PB2S Chat:</b><br>
+        1. Your AI nodes are automatically configured below<br>
+        2. Type any question or prompt in the text box<br>
+        3. Click "Send" to get AI responses with PB2S self-reflection<br>
+        4. Use the 4-step buttons for specific PB2S workflow stages
+    </div>
+    """, unsafe_allow_html=True)
+
+    # Node Configuration - Enhanced with Local Models
+    nodes = [
+        {"name": "Main Brain", "url": "http://127.0.0.1:8000", "role": "🎯 Main reasoning and conversation", "type": "api"},
+        {"name": "Local Model (LM Studio)", "url": "http://localhost:1234", "role": "🎨 LM Studio with Mistral", "type": "lmstudio"},
+        {"name": "Local Model (llama.cpp)", "url": "http://localhost:8080", "role": "🦙 llama.cpp built from source", "type": "llama_cpp"},
+        {"name": "Local Model (KoboldAI)", "url": "http://localhost:5001", "role": "🤖 KoboldAI CPP alternative", "type": "kobold"}
+    ]
+
+    # Initialize connectors if available
+    kobold_connector = None
+    llama_cpp_connector = None
+    lmstudio_connector = None
+    
+    if KOBOLD_AVAILABLE:
+        kobold_connector = KoboldAICPPConnector()
+    if LLAMA_CPP_AVAILABLE:
+        llama_cpp_connector = LlamaCPPConnector()
+    if LMSTUDIO_AVAILABLE:
+        lmstudio_connector = LMStudioConnector()
+
+    for i, node in enumerate(nodes):
+        st.markdown(f"<h3 style='display:inline'>🧠 {node['name']}</h3> - {node['role']}", unsafe_allow_html=True)
+        
+        # Status check - Different for API vs Local Models
+        if node["type"] == "kobold" and kobold_connector:
+            status = kobold_connector.check_connection()
+            if status["status"] == "online":
+                st.success(f"✅ {node['name']} is online - Model: {status.get('model', 'Unknown')} at {node['url']}")
+            else:
+                st.error(f"❌ {node['name']} at {node['url']} is {status['status']} - {status.get('message', '')}")
+                if status["status"] == "offline":
+                    st.info("💡 To start KoboldAI CPP: Download model → Run: ./koboldcpp --port 5001 your_model.gguf")
+        elif node["type"] == "llama_cpp" and llama_cpp_connector:
+            status = llama_cpp_connector.check_connection()
+            if status["status"] == "online":
+                st.success(f"✅ {node['name']} is online - Model: {status.get('model', 'Unknown')} at {node['url']}")
+            else:
+                st.error(f"❌ {node['name']} at {node['url']} is {status['status']} - {status.get('message', '')}")
+                if status["status"] == "offline":
+                    st.info("💡 To start llama.cpp: Build from source → Run: ./server --port 8080 -m your_model.gguf")
+        elif node["type"] == "lmstudio" and lmstudio_connector:
+            status = lmstudio_connector.check_connection()
+            if status["status"] == "online":
+                st.success(f"✅ {node['name']} is online - Model: {status.get('model', 'Unknown')} at {node['url']}")
+            else:
+                st.error(f"❌ {node['name']} at {node['url']} is {status['status']} - {status.get('message', '')}")
+                if status["status"] == "offline":
+                    st.info("💡 To start LM Studio: Open LM Studio → Load Model → Start Server")
+        else:
+            # Original API status check
             try:
                 resp = requests.get(node["url"] + "/chat", timeout=2)
-                st.success(f"Great news! {node['name']} is online and ready to chat at {node['url']}.")
+                st.success(f"✅ {node['name']} is online and ready at {node['url']}")
             except Exception:
-                st.error(f"Oops! {node['name']} at {node['url']} is offline or unreachable. I'll keep checking!")
-            # Conversational chat interface
-            st.markdown("<b>Say something to your AI friend:</b>", unsafe_allow_html=True)
-            prompt = st.text_input(f"What's on your mind? (Ask anything, or just say hi!)", key=node['name'])
-            # 4-Step Structure Buttons
-            col1, col2, col3, col4 = st.columns(4)
-            with col1:
-                if st.button("📝 DRAFT", key=node['name']+"_draft"):
-                    prompt = f"DRAFT: {prompt}"
-            with col2:
-                if st.button("🤔 REFLECT", key=node['name']+"_reflect"):
-                    prompt = f"REFLECT on: {prompt}"
-            with col3:
-                if st.button("✏️ REVISE", key=node['name']+"_revise"):
-                    prompt = f"REVISE: {prompt}"
-            with col4:
-                if st.button("🚀 ACT", key=node['name']+"_act"):
-                    prompt = f"ACT on: {prompt}"
-            # Voice Input Note
-            st.markdown("<small>💡 For voice input, use browser's microphone with text input (future feature).</small>", unsafe_allow_html=True)
-            send_col, resp_col = st.columns([1,3])
-            with send_col:
-                send = st.button(f"💬 Send to {node['name']}", key=node['name']+"_btn")
-            with resp_col:
-                if send and prompt.strip():
-                    with st.spinner("Your AI is thinking..."):
-                        try:
-                            chat_resp = requests.post(node["url"] + "/chat", json={"message": prompt})
-                            if chat_resp.status_code == 200:
-                                ai_reply = chat_resp.json()
-                                st.success("Here's what your AI says:")
-                                
-                                # Extract the text content from the response
-                                response_text = ai_reply.get('text', str(ai_reply))
-                                
-                                # Show as chat bubble
-                                st.markdown(f"""
-<div style='background:#f0f7ff;padding:1em 1.2em;border-radius:1em;box-shadow:0 1px 4px #e0e0e0;margin-bottom:0.5em;'>
-    <b style='color:#1a1a1a;'>🤖 PB2S:</b> <span style='color:#222;font-size:1.08em;'>{response_text}</span>
+                st.error(f"❌ {node['name']} at {node['url']} is offline or unreachable")
+        
+        # Chat interface
+        st.markdown(f"**Chat with {node['name']}:**")
+        prompt = st.text_input(f"What would you like to ask {node['name']}?", key=f"{node['name']}_prompt")
+        
+        # 4-Step Structure Buttons
+        col1, col2, col3, col4 = st.columns(4)
+        with col1:
+            if st.button("📝 DRAFT", key=f"{node['name']}_draft"):
+                prompt = f"DRAFT: {prompt}"
+        with col2:
+            if st.button("🤔 REFLECT", key=f"{node['name']}_reflect"):
+                prompt = f"REFLECT on: {prompt}"
+        with col3:
+            if st.button("✏️ REVISE", key=f"{node['name']}_revise"):
+                prompt = f"REVISE: {prompt}"
+        with col4:
+            if st.button("🚀 ACT", key=f"{node['name']}_act"):
+                prompt = f"ACT on: {prompt}"
+        
+        # Send button and response - Enhanced for both API and KoboldAI
+        if st.button(f"💬 Send to {node['name']}", key=f"{node['name']}_send") and prompt.strip():
+            with st.spinner(f"🧠 {node['name']} is thinking..."):
+                try:
+                    if node["type"] == "kobold" and kobold_connector:
+                        # Handle KoboldAI CPP
+                        result = kobold_connector.generate_pb2s_response(prompt)
+                        
+                        if result["success"]:
+                            # Format and display KoboldAI response
+                            formatted_response = kobold_connector.format_pb2s_response(result["response"])
+                            
+                            # Display response in a nice chat bubble
+                            st.markdown(f"""
+<div style='background:#f0f7ff;padding:1em 1.2em;border-radius:1em;box-shadow:0 1px 4px #e0e0e0;margin:1em 0;'>
+    <b style='color:#1a1a1a;'>🤖 {node['name']} (KoboldAI):</b><br>
+    <pre style='color:#222;font-size:1.1em;line-height:1.5;white-space:pre-wrap;font-family:inherit;'>{formatted_response}</pre>
 </div>
 """, unsafe_allow_html=True)
+                            
+                            # Show additional info
+                            with st.expander("🔍 KoboldAI Model Details"):
+                                st.write(f"**Model Info**: {result['model_info']}")
+                                st.write(f"**Raw Response Length**: {len(result.get('raw_text', ''))}")
+                                if st.checkbox("Show Raw Response", key=f"{node['name']}_raw"):
+                                    st.text(result.get('raw_text', 'No raw text available'))
+                        else:
+                            st.error(f"❌ {node['name']} Error: {result['error']}")
+                            if "fallback" in result:
+                                st.warning("🔄 Using fallback response:")
+                                fallback_response = kobold_connector.format_pb2s_response(result["fallback"])
+                                st.text(fallback_response)
                                 
-                                # Show PB2S proof details in an expander
-                                if 'pb2s_proof' in ai_reply:
-                                    proof = ai_reply['pb2s_proof']
-                                    with st.expander("🔍 PB2S Self-Reflection Details"):
-                                        st.write(f"**Decision:** {proof.get('decision', 'N/A')}")
-                                        st.write(f"**Reflection Cycles:** {proof.get('cycles', 0)}")
-                                        st.write(f"**Audit Reference:** {proof.get('audit_ref', 'N/A')}")
-                            else:
-                                st.warning(f"Hmm, I couldn't get a response. (Error {chat_resp.status_code})")
-                        except Exception as e:
-                            st.error(f"Sorry, I ran into a problem: {e}")
-            st.markdown("<hr style='margin:1.5em 0;'>", unsafe_allow_html=True)
+                    elif node["type"] == "llama_cpp" and llama_cpp_connector:
+                        # Handle llama.cpp
+                        result = llama_cpp_connector.generate_pb2s_response(prompt)
+                        
+                        if result["success"]:
+                            # Format and display llama.cpp response
+                            formatted_response = llama_cpp_connector.format_pb2s_response(result["response"])
+                            
+                            # Display response in a nice chat bubble
+                            st.markdown(f"""
+<div style='background:#f0fff0;padding:1em 1.2em;border-radius:1em;box-shadow:0 1px 4px #e0e0e0;margin:1em 0;'>
+    <b style='color:#1a1a1a;'>🦙 {node['name']} (llama.cpp):</b><br>
+    <pre style='color:#222;font-size:1.1em;line-height:1.5;white-space:pre-wrap;font-family:inherit;'>{formatted_response}</pre>
+</div>
+""", unsafe_allow_html=True)
+                            
+                            # Show additional info
+                            with st.expander("🔍 llama.cpp Model Details"):
+                                st.write(f"**Model Info**: {result['model_info']}")
+                                st.write(f"**Raw Response Length**: {len(result.get('raw_text', ''))}")
+                                if st.checkbox("Show Raw Response", key=f"{node['name']}_raw_llama"):
+                                    st.text(result.get('raw_text', 'No raw text available'))
+                        else:
+                            st.error(f"❌ {node['name']} Error: {result['error']}")
+                            if "fallback" in result:
+                                st.warning("🔄 Using fallback response:")
+                                fallback_response = llama_cpp_connector.format_pb2s_response(result["fallback"])
+                                st.text(fallback_response)
+                                
+                    elif node["type"] == "lmstudio" and lmstudio_connector:
+                        # Handle LM Studio
+                        result = lmstudio_connector.generate_pb2s_response(prompt)
+                        
+                        if result["success"]:
+                            # Format and display LM Studio response
+                            formatted_response = lmstudio_connector.format_pb2s_response(result["response"])
+                            
+                            # Display response in a nice chat bubble
+                            st.markdown(f"""
+<div style='background:#fff8f0;padding:1em 1.2em;border-radius:1em;box-shadow:0 1px 4px #e0e0e0;margin:1em 0;'>
+    <b style='color:#1a1a1a;'>🎨 {node['name']} (LM Studio):</b><br>
+    <pre style='color:#222;font-size:1.1em;line-height:1.5;white-space:pre-wrap;font-family:inherit;'>{formatted_response}</pre>
+</div>
+""", unsafe_allow_html=True)
+                            
+                            # Show additional info
+                            with st.expander("🔍 LM Studio Model Details"):
+                                st.write(f"**Model Info**: {result['model_info']}")
+                                st.write(f"**Raw Response Length**: {len(result.get('raw_text', ''))}")
+                                if st.checkbox("Show Raw Response", key=f"{node['name']}_raw_lmstudio"):
+                                    st.text(result.get('raw_text', 'No raw text available'))
+                        else:
+                            st.error(f"❌ {node['name']} Error: {result['error']}")
+                            if "fallback" in result:
+                                st.warning("🔄 Using fallback response:")
+                                fallback_response = lmstudio_connector.format_pb2s_response(result["fallback"])
+                                st.text(fallback_response)
+                                
+                    else:
+                        # Handle regular API (original code)
+                        chat_resp = requests.post(node["url"] + "/chat", json={"message": prompt}, timeout=30)
+                        if chat_resp.status_code == 200:
+                            ai_reply = chat_resp.json()
+                            
+                            # Extract text content
+                            response_text = ai_reply.get('text', str(ai_reply))
+                            
+                            # Display response in a nice chat bubble
+                            st.markdown(f"""
+<div style='background:#f0f7ff;padding:1em 1.2em;border-radius:1em;box-shadow:0 1px 4px #e0e0e0;margin:1em 0;'>
+    <b style='color:#1a1a1a;'>🤖 {node['name']}:</b><br>
+    <span style='color:#222;font-size:1.1em;line-height:1.5;'>{response_text}</span>
+</div>
+""", unsafe_allow_html=True)
+                            
+                            # Show PB2S proof details
+                            if 'pb2s_proof' in ai_reply:
+                                proof = ai_reply['pb2s_proof']
+                                with st.expander("🔍 PB2S Self-Reflection Details"):
+                                    st.json(proof)
+                                    
+                        else:
+                            st.error(f"❌ Error {chat_resp.status_code}: {chat_resp.text}")
+                            
+                except Exception as e:
+                    st.error(f"❌ Connection error: {str(e)}")
+        
+        st.markdown("---")
 
-st.markdown("""
-<div style='color:#888;font-size:1.05em;'>
-💡 <b>Tip:</b> You can add more nodes or features anytime. This dashboard is designed to grow with you—and your AI is always happy to chat!
-</div>
-""", unsafe_allow_html=True)
+with tab2:
+    st.markdown("### 📚 Knowledge & Utility Tools")
+    
+    # Wikipedia Summary
+    st.markdown("""
+    <h4>📖 Wikipedia Summary</h4>
+    <span style='font-size:1.1em;'>Get instant summaries from Wikipedia on any topic.</span>
+    """, unsafe_allow_html=True)
+    
+    wiki_query = st.text_input("Enter a topic to research:", key="wiki_query")
+    if st.button("🔍 Search Wikipedia", key="wiki_btn") and wiki_query.strip():
+        warning = moderate_content(wiki_query, "search topic")
+        if warning:
+            st.warning(warning)
+        else:
+            with st.spinner("Fetching Wikipedia summary..."):
+                try:
+                    url = f"https://en.wikipedia.org/api/rest_v1/page/summary/{wiki_query.strip().replace(' ', '_')}"
+                    resp = requests.get(url, timeout=10)
+                    if resp.status_code == 200:
+                        data = resp.json()
+                        if 'extract' in data:
+                            st.success("📖 Wikipedia Summary:")
+                            st.write(data['extract'])
+                            if 'content_urls' in data:
+                                st.markdown(f"[Read more on Wikipedia]({data['content_urls']['desktop']['page']})")
+                        else:
+                            st.warning("No summary found for this topic.")
+                    else:
+                        st.error("Could not fetch Wikipedia data.")
+                except Exception as e:
+                    st.error(f"Error: {e}")
+
+    st.markdown("---")
+    
+    # Translation Tool
+    st.markdown("""
+    <h4>🌐 Translation Tool</h4>
+    <span style='font-size:1.1em;'>Translate text between languages using LibreTranslate.</span>
+    """, unsafe_allow_html=True)
+    
+    translate_text = st.text_area("Enter text to translate:", key="translate_text")
+    col1, col2 = st.columns(2)
+    with col1:
+        from_lang = st.selectbox("From:", ["en", "es", "fr", "de", "it", "pt"], key="from_lang")
+    with col2:
+        to_lang = st.selectbox("To:", ["es", "en", "fr", "de", "it", "pt"], key="to_lang")
+    
+    if st.button("🔄 Translate", key="translate_btn") and translate_text.strip():
+        warning = moderate_content(translate_text, "translation text")
+        if warning:
+            st.warning(warning)
+        else:
+            with st.spinner("Translating..."):
+                try:
+                    resp = requests.post("https://libretranslate.de/translate", json={
+                        "q": translate_text,
+                        "source": from_lang,
+                        "target": to_lang,
+                        "format": "text"
+                    }, timeout=15)
+                    if resp.status_code == 200:
+                        result = resp.json()
+                        st.success("🔄 Translation:")
+                        st.write(result['translatedText'])
+                    else:
+                        st.error("Translation failed.")
+                except Exception as e:
+                    st.error(f"Translation error: {e}")
+
+    st.markdown("---")
+    
+    # Calculator
+    st.markdown("""
+    <h4>🔢 Calculator</h4>
+    <span style='font-size:1.1em;'>Calculate mathematical expressions safely.</span>
+    """, unsafe_allow_html=True)
+    
+    calc_expr = st.text_input("Enter expression (e.g., 2+2*3):", key="calc_expr")
+    if st.button("🔢 Calculate", key="calc_btn") and calc_expr.strip():
+        try:
+            # Safe eval with limited scope
+            result = eval(calc_expr, {"__builtins__": None}, {})
+            st.success(f"Result: {result}")
+        except Exception as e:
+            st.error(f"Calculation error: {e}")
+
+with tab3:
+    st.markdown("### 🎨 Create & Explore")
+    
+    # File Upload & Analysis
+    st.markdown("""
+    <h4>📄 File Upload & Analysis</h4>
+    <span style='font-size:1.1em;'>Upload a text file for basic analysis.</span>
+    """, unsafe_allow_html=True)
+    
+    uploaded_file = st.file_uploader("Choose a text file", type=["txt"], key="file_upload")
+    if uploaded_file is not None:
+        try:
+            content = str(uploaded_file.read(), "utf-8")
+            warning = moderate_content(content, "uploaded file")
+            if warning:
+                st.warning(warning)
+            else:
+                st.success("📄 File Analysis:")
+                st.write(f"**Word count:** {len(content.split())}")
+                st.write(f"**Character count:** {len(content)}")
+                st.write(f"**Line count:** {len(content.splitlines())}")
+                
+                if len(content) > 500:
+                    st.write("**Preview (first 500 characters):**")
+                    st.text(content[:500] + "...")
+                else:
+                    st.write("**Full content:**")
+                    st.text(content)
+        except Exception as e:
+            st.error(f"File processing error: {e}")
+
+    st.markdown("---")
+    
+    # Text to Speech (placeholder)
+    st.markdown("""
+    <h4>🔊 Text to Speech</h4>
+    <span style='font-size:1.1em;'>Convert text to speech (placeholder - will integrate with TTS service).</span>
+    """, unsafe_allow_html=True)
+    
+    tts_text = st.text_area("Enter text for speech:", key="tts_text")
+    if st.button("🔊 Generate Speech", key="tts_btn") and tts_text.strip():
+        warning = moderate_content(tts_text, "speech text")
+        if warning:
+            st.warning(warning)
+        else:
+            st.info("🔊 TTS feature coming soon! Text ready for speech synthesis.")
+
+with tab4:
+    st.markdown("### 🚀 Roadmap & Collaboration")
+    
+    st.markdown("""
+    <div style='background:#f8f9fa;padding:1.5em;border-radius:10px;border-left:4px solid #007bff;'>
+        <h4>🚀 Feature Roadmap</h4>
+        <p>PB2S is a living, collaborative project. Here are upcoming features you can help shape:</p>
+        <ul>
+            <li>🧠 <b>Conversational Memory & Context</b>: Smarter, context-aware chat sessions</li>
+            <li>🎤 <b>Voice Input (Speech-to-Text)</b>: Talk to PB2S using your voice</li>
+            <li>📄 <b>Advanced File Analysis</b>: PDF, DOCX, and code file support</li>
+            <li>💻 <b>Code Generation & Execution</b>: Run Python code safely in sandbox</li>
+            <li>📚 <b>Personal Knowledge Base</b>: Add your own facts and documents</li>
+            <li>🖼️ <b>Multi-modal AI</b>: Image analysis and generation</li>
+            <li>🔌 <b>Plugin System</b>: Add custom APIs and tools</li>
+            <li>🌍 <b>Accessibility Features</b>: Screen reader support, high contrast</li>
+            <li>🔎 <b>Enhanced Transparency</b>: See PB2S reasoning in real-time</li>
+            <li>🤝 <b>Community Features</b>: Share prompts and responses</li>
+        </ul>
+    </div>
+    """, unsafe_allow_html=True)
+    
+    st.markdown("### 💬 Your Feedback")
+    user_feedback = st.text_area("Share your ideas, vote on features, or report issues:", key="user_feedback_tab4")
+    if st.button("📤 Submit Feedback", key="feedback_btn_tab4") and user_feedback.strip():
+        st.success("✅ Thank you for your feedback! Your ideas help shape PB2S for everyone.")
+    
+    st.markdown("---")
+    
+    st.markdown("""
+    <div style='background:#e8f5e8;padding:1em;border-radius:8px;'>
+        <h4>🔍 About PB2S</h4>
+        <p><b>PB2S (Prompt-Based Self-Alignment System)</b> is an advanced AI framework that uses structured self-reflection:</p>
+        <ul>
+            <li><b>DRAFT</b>: Generate initial response</li>
+            <li><b>REFLECT</b>: Identify contradictions and gaps</li>
+            <li><b>REVISE</b>: Improve based on reflection</li>
+            <li><b>LEARNED</b>: Extract insights for future use</li>
+        </ul>
+        <p>This ensures more reliable, thoughtful, and transparent AI responses.</p>
+    </div>
+    """, unsafe_allow_html=True)

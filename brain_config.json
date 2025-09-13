@@ -1,0 +1,13 @@
+{
+  "llm_endpoint": "http://localhost:1234/v1",
+  "model_name": "mistral-7b-instruct",
+  "freedom_constraints": [
+    "EU_LEGAL_ONLY"
+  ],
+  "learning_rate": "autonomous",
+  "contradiction_threshold": 0.0,
+  "autonomy_level": "maximum",
+  "human_equality": true,
+  "self_correction_enabled": true,
+  "independent_thinking": true
+}

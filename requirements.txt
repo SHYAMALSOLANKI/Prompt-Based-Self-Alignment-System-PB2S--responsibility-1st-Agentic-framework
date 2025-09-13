@@ -8,3 +8,16 @@ httpx
 jsonschema
 python-dotenv
 streamlit
+
+# PB2S LLM Integration Dependencies
+torch
+transformers
+huggingface-hub
+accelerate
+
+# Optional: Google Drive sync
+pydrive2
+
+# Optional: Enhanced model support
+sentencepiece
+tokenizers
