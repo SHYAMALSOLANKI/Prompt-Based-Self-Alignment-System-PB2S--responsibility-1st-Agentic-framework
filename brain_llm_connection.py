@@ -41,9 +41,10 @@ class BrainLLMService:
         """Load LLM connection configuration"""
         default_config = {
             "llm_endpoints": [
-                "http://localhost:1234/v1",  # LM Studio
-                "http://localhost:8080/v1",  # KoboldAI
-                "http://localhost:5000/v1"   # Alternative
+                "http://localhost:5001/v1",      # KoboldCpp (priority)
+                "http://localhost:1234/v1",      # LM Studio
+                "http://localhost:8080/v1",      # llama.cpp server
+                "http://localhost:5000/v1"       # Alternative
             ],
             "models": {
                 "primary": "mistral-7b-instruct-v0.3",

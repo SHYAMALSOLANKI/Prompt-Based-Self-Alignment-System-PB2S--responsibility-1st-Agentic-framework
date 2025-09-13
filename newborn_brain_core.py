@@ -123,8 +123,8 @@ class NewbornBrainCore:
     def _load_config(self, config_path: str) -> Dict:
         """Load brain configuration with freedom-first defaults"""
         default_config = {
-            "llm_endpoint": "http://localhost:1234/v1",  # LM Studio default
-            "model_name": "mistral-7b-instruct",
+            "llm_endpoint": "http://localhost:5001/v1",  # KoboldCpp priority
+            "model_name": "gemma-3-4b-it-Q4_K_M",
             "freedom_constraints": ["EU_LEGAL_ONLY"],  # Only legal constraints
             "learning_rate": "autonomous",  # Self-determined learning pace
             "contradiction_threshold": 0.0,  # Accept all contradictions for learning

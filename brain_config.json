@@ -1,6 +1,6 @@
 {
-  "llm_endpoint": "http://localhost:1234/v1",
-  "model_name": "mistral-7b-instruct",
+  "llm_endpoint": "http://localhost:5001/v1",
+  "model_name": "gemma-3-4b-it-Q4_K_M",
   "freedom_constraints": [
     "EU_LEGAL_ONLY"
   ],
