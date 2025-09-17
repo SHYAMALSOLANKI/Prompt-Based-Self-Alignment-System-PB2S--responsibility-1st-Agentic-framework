@@ -410,6 +410,31 @@ with tab3:
             st.error(f"File processing error: {e}")
 
     st.markdown("---")
+
+    # --- Yantra Pattern Generator Integration ---
+    st.markdown("<h4>🕉️ Yantra Pattern Generator</h4>", unsafe_allow_html=True)
+    st.write("Generate a yantra (geometric pattern) from any text, mantra, or thought.")
+    import importlib.util, os
+    mantra_path = os.path.join(os.path.dirname(__file__), 'mantra_yantra', 'mantra_to_yantra.py')
+    spec = importlib.util.spec_from_file_location("mantra_to_yantra", mantra_path)
+    mantra_yantra = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mantra_yantra)
+    yantra_text = st.text_area("Enter text/mantra/thought for yantra:", "Om Mani Padme Hum", key="yantra_text")
+    if st.button("Generate Yantra Pattern", key="yantra_btn"):
+        try:
+            pattern = mantra_yantra.convert_text_to_yantra(yantra_text)
+            import matplotlib.pyplot as plt
+            import io
+            buf = io.BytesIO()
+            fig, ax = plt.subplots(figsize=(6,6))
+            ax.imshow(pattern)
+            ax.axis('off')
+            plt.tight_layout()
+            fig.savefig(buf, format='png')
+            st.image(buf, caption="Yantra Pattern", use_column_width=True)
+            plt.close(fig)
+        except Exception as e:
+            st.error(f"Failed to generate yantra: {e}")
     
     # Text to Speech (placeholder)
     st.markdown("""

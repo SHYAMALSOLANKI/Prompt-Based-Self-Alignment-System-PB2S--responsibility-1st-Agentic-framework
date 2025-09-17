@@ -45,7 +45,22 @@ class BrainNetworkDashboard:
         self.network_status = {}
         self.brain_logs = []
         self.performance_data = []
+        self.brain_connection = None
         
+    def check_brain_connection(self):
+        """Check if autonomous brain is running locally"""
+        try:
+            # Check for brain log file
+            log_file = Path("autonomous_brain.log")
+            if log_file.exists():
+                # Read recent logs
+                with open(log_file, 'r', encoding='utf-8', errors='ignore') as f:
+                    recent_logs = f.readlines()[-20:]  # Last 20 lines
+                return True, recent_logs
+            return False, []
+        except Exception as e:
+            return False, [f"Error checking brain: {str(e)}"]
+    
     def load_network_status(self):
         """Load network status from coordinator"""
         try:
@@ -115,13 +130,13 @@ def main():
         
         # Refresh button
         if st.button("🔄 Refresh All Data", type="primary"):
-            st.experimental_rerun()
+            st.rerun()
         
         # Auto-refresh toggle
-        auto_refresh = st.checkbox("⚡ Auto-refresh (10s)", value=True)
+        auto_refresh = st.checkbox("⚡ Auto-refresh (10s)", value=False)
         if auto_refresh:
             time.sleep(10)
-            st.experimental_rerun()
+            st.rerun()
             
         # System controls
         st.header("🚀 System Controls")
@@ -146,13 +161,17 @@ def main():
     dashboard.load_brain_logs()
     llm_status = dashboard.test_llm_servers()
     
+    # Check brain connection status
+    brain_online, brain_logs = dashboard.check_brain_connection()
+    
     # Main dashboard content
-    tab1, tab2, tab3, tab4, tab5 = st.tabs([
+    tab1, tab2, tab3, tab4, tab5, tab6 = st.tabs([
         "🏠 Network Overview", 
-        "🧠 Brain Activity", 
+        "🧠 Live Brain Monitor", 
         "🤖 LLM Status", 
         "📊 Performance", 
-        "📋 System Logs"
+        "📋 System Logs",
+        "🎯 Brain Control"
     ])
     
     with tab1:
@@ -261,19 +280,91 @@ def main():
             st.info("🔍 No network data available. Start the network coordinator to see live status.")
     
     with tab2:
-        st.header("🧠 Brain Activity")
+        st.header("🧠 Live Brain Monitor")
         
-        # Brain capabilities status
-        st.subheader("⚡ Active Capabilities")
+        # Real-time brain status
+        col1, col2, col3, col4 = st.columns(4)
+        
+        with col1:
+            brain_status = "🟢 ONLINE" if brain_online else "🔴 OFFLINE"
+            st.metric("Brain Status", brain_status)
+        
+        with col2:
+            if brain_online and brain_logs:
+                last_activity = datetime.now().strftime("%H:%M:%S")
+                st.metric("Last Activity", last_activity)
+            else:
+                st.metric("Last Activity", "N/A")
+        
+        with col3:
+            # Count active capabilities from recent logs
+            active_caps = 0
+            if brain_logs:
+                for log in brain_logs[-10:]:
+                    if "✅" in log and "capability" in log.lower():
+                        active_caps += 1
+            st.metric("Active Capabilities", active_caps)
+        
+        with col4:
+            # Brain thinking cycles
+            thinking_cycles = 0
+            if brain_logs:
+                for log in brain_logs[-10:]:
+                    if "🧠 BRAIN CYCLE" in log:
+                        thinking_cycles += 1
+            st.metric("Recent Cycles", thinking_cycles)
+        
+        # Live brain logs
+        st.subheader("📝 Live Brain Activity")
+        
+        if brain_online and brain_logs:
+            # Auto-refresh checkbox
+            auto_refresh = st.checkbox("🔄 Auto-refresh (every 5 seconds)")
+            
+            if auto_refresh:
+                # Auto-refresh the page every 5 seconds
+                time.sleep(0.1)
+                st.rerun()
+            
+            # Display recent logs
+            log_container = st.container()
+            with log_container:
+                for log_line in brain_logs[-15:]:  # Show last 15 lines
+                    log_line = log_line.strip()
+                    if log_line:
+                        # Color code the logs
+                        if "🧠 BRAIN CYCLE" in log_line:
+                            st.info(f"🧠 {log_line}")
+                        elif "✅" in log_line:
+                            st.success(f"✅ {log_line}")
+                        elif "❌" in log_line or "ERROR" in log_line:
+                            st.error(f"❌ {log_line}")
+                        elif "🎯" in log_line:
+                            st.warning(f"🎯 {log_line}")
+                        else:
+                            st.text(log_line)
+        else:
+            st.warning("🤖 Brain is not currently running")
+            
+            col1, col2 = st.columns(2)
+            with col1:
+                if st.button("🚀 Launch Brain"):
+                    st.info("Use the .bat launcher or run: python launch_brain_fixed.py")
+            with col2:
+                if st.button("📖 View Brain Guide"):
+                    st.info("Check HOME_AI_BRAIN_NETWORK_GUIDE.md for setup instructions")
+        
+        # Brain capabilities overview
+        st.subheader("⚡ Brain Capabilities Overview")
         
         capabilities = [
-            "Speech Recognition", "Speech Synthesis", "Natural Language",
-            "Computer Vision", "Image Recognition", "Visual Reasoning",
-            "Logical Reasoning", "Creative Thinking", "Problem Solving",
-            "Pattern Recognition", "Programming", "Mathematics",
-            "Data Analysis", "System Thinking", "Contradiction Detection",
-            "Self Reflection", "Autonomous Learning", "Metacognition",
-            "Empathy", "Emotional Reasoning", "Social Understanding"
+            "🎤 Speech Recognition", "🔊 Speech Synthesis", "💬 Natural Language",
+            "👁️ Computer Vision", "🖼️ Image Recognition", "🎨 Visual Reasoning",
+            "🧩 Logical Reasoning", "💡 Creative Thinking", "🔧 Problem Solving",
+            "🔍 Pattern Recognition", "💻 Programming", "🔢 Mathematics",
+            "📊 Data Analysis", "🌐 System Thinking", "⚖️ Contradiction Detection",
+            "🪞 Self Reflection", "📚 Autonomous Learning", "🧠 Metacognition",
+            "❤️ Empathy", "😊 Emotional Reasoning", "👥 Social Understanding"
         ]
         
         # Display capabilities in a grid
@@ -447,6 +538,163 @@ def main():
                 file_name=f"brain_logs_{datetime.now().strftime('%Y%m%d_%H%M%S')}.txt",
                 mime="text/plain"
             )
+    
+    with tab6:
+        st.header("🎯 Brain Control Center")
+        
+        # Brain launch controls
+        st.subheader("🚀 Brain Launch Controls")
+        
+        col1, col2, col3 = st.columns(3)
+        
+        with col1:
+            if st.button("🧪 Test Brain (1 min)", key="test_brain"):
+                st.info("Starting 1-minute brain test...")
+                st.code("python launch_brain_fixed.py --test", language="bash")
+                st.success("Use the command above in your terminal!")
+        
+        with col2:
+            if st.button("🧠 Launch Full Brain", key="full_brain"):
+                st.info("Starting full autonomous brain...")
+                st.code("python launch_brain_fixed.py", language="bash")
+                st.warning("This will run until stopped with Ctrl+C")
+        
+        with col3:
+            if st.button("🌟 Launch Complete System", key="complete_system"):
+                st.info("Starting complete AI system...")
+                st.code("LAUNCH_BRAIN_ULTIMATE.bat", language="bash")
+                st.success("Use the .bat launcher for full system!")
+        
+        # Brain configuration
+        st.subheader("⚙️ Brain Configuration")
+        
+        # Load current brain config
+        config_file = Path("brain_config.json")
+        if config_file.exists():
+            with open(config_file, 'r') as f:
+                brain_config = json.load(f)
+        else:
+            brain_config = {
+                "learning_rate": 0.1,
+                "thinking_cycles": 10,
+                "capability_timeout": 30,
+                "auto_learning": True,
+                "verbose_mode": True
+            }
+        
+        # Editable configuration
+        col1, col2 = st.columns(2)
+        
+        with col1:
+            learning_rate = st.slider("Learning Rate", 0.01, 1.0, brain_config.get("learning_rate", 0.1))
+            thinking_cycles = st.number_input("Thinking Cycles", 1, 100, brain_config.get("thinking_cycles", 10))
+            capability_timeout = st.number_input("Capability Timeout (s)", 5, 300, brain_config.get("capability_timeout", 30))
+        
+        with col2:
+            auto_learning = st.checkbox("Auto Learning", brain_config.get("auto_learning", True))
+            verbose_mode = st.checkbox("Verbose Mode", brain_config.get("verbose_mode", True))
+            debug_mode = st.checkbox("Debug Mode", brain_config.get("debug_mode", False))
+        
+
+        # Page configuration
+        st.set_page_config(
+            page_title="\ud83e\udde0 Home AI Brain Network",
+            page_icon="\ud83e\udde0",
+            layout="wide",
+            initial_sidebar_state="expanded"
+        )
+
+        # --- Yantra Pattern Generator Integration ---
+        st.markdown("<h4>🕉️ Yantra Pattern Generator</h4>", unsafe_allow_html=True)
+        st.write("Generate a yantra (geometric pattern) from any text, mantra, or thought.")
+        import importlib.util, os
+        mantra_path = os.path.join(os.path.dirname(__file__), 'mantra_yantra', 'mantra_to_yantra.py')
+        spec = importlib.util.spec_from_file_location("mantra_to_yantra", mantra_path)
+        mantra_yantra = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(mantra_yantra)
+        yantra_text = st.text_area("Enter text/mantra/thought for yantra:", "Om Mani Padme Hum", key="yantra_text_dash")
+        if st.button("Generate Yantra Pattern", key="yantra_btn_dash"):
+            try:
+                pattern = mantra_yantra.convert_text_to_yantra(yantra_text)
+                import matplotlib.pyplot as plt
+                import io
+                buf = io.BytesIO()
+                fig, ax = plt.subplots(figsize=(6,6))
+                ax.imshow(pattern)
+                ax.axis('off')
+                plt.tight_layout()
+                fig.savefig(buf, format='png')
+                st.image(buf, caption="Yantra Pattern", use_column_width=True)
+                plt.close(fig)
+            except Exception as e:
+                st.error(f"Failed to generate yantra: {e}")
+                "verbose_mode": verbose_mode,
+                "debug_mode": debug_mode,
+                "updated": datetime.now().isoformat()
+            }
+            
+            with open(config_file, 'w') as f:
+                json.dump(new_config, f, indent=2)
+            
+            st.success("✅ Brain configuration saved!")
+        
+        # Quick actions
+        st.subheader("⚡ Quick Actions")
+        
+        col1, col2, col3, col4 = st.columns(4)
+        
+        with col1:
+            if st.button("📊 View Logs"):
+                if Path("autonomous_brain.log").exists():
+                    with open("autonomous_brain.log", 'r', encoding='utf-8', errors='ignore') as f:
+                        logs = f.read()
+                    st.text_area("Recent Brain Logs", logs[-2000:], height=200)
+                else:
+                    st.warning("No brain logs found")
+        
+        with col2:
+            if st.button("🔄 Restart Bridge"):
+                st.info("Restart the brain-dashboard bridge:")
+                st.code("python brain_dashboard_bridge.py", language="bash")
+        
+        with col3:
+            if st.button("🌐 Network Status"):
+                st.info("Checking network coordinator...")
+                try:
+                    response = requests.get("http://localhost:8080/status", timeout=2)
+                    st.success("✅ Network coordinator is running")
+                except:
+                    st.error("❌ Network coordinator is offline")
+        
+        with col4:
+            if st.button("📖 Open Guide"):
+                st.info("Opening deployment guide...")
+                guide_file = Path("HOME_AI_BRAIN_NETWORK_GUIDE.md")
+                if guide_file.exists():
+                    st.success("✅ Guide available in your directory")
+                else:
+                    st.error("❌ Guide not found")
+        
+        # System information
+        st.subheader("ℹ️ System Information")
+        
+        info_col1, info_col2 = st.columns(2)
+        
+        with info_col1:
+            st.info(f"""
+            **🧠 Brain System**
+            - Status: {'🟢 Ready' if Path('launch_brain_fixed.py').exists() else '❌ Missing'}
+            - Core: {'🟢 Ready' if Path('newborn_brain_core.py').exists() else '❌ Missing'}
+            - Config: {'🟢 Ready' if Path('brain_config.json').exists() else '⚠️ Default'}
+            """)
+        
+        with info_col2:
+            st.info(f"""
+            **📊 Dashboard System**
+            - Bridge: {'🟢 Ready' if Path('brain_dashboard_bridge.py').exists() else '❌ Missing'}
+            - Network: {'🟢 Ready' if Path('network_coordinator.py').exists() else '❌ Missing'}
+            - Launcher: {'🟢 Ready' if Path('LAUNCH_BRAIN_ULTIMATE.bat').exists() else '❌ Missing'}
+            """)
     
     # Footer
     st.markdown("---")
