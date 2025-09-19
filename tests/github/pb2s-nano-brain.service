@@ -1,0 +1,20 @@
+[Unit]
+Description=PB2S Nano Brain System
+After=network.target
+After=multi-user.target
+Wants=network.target
+
+[Service]
+Type=simple
+User=jetson
+WorkingDirectory=/tmp
+Environment=PYTHONUNBUFFERED=1
+ExecStartPre=/bin/sleep 30
+ExecStart=/bin/bash -c 'for script in /media/jetson/*/pb2s_nano_autostart.sh /mnt/*/pb2s_nano_autostart.sh; do if [ -f "$script" ]; then chmod +x "$script"; bash "$script"; break; fi; done'
+Restart=on-failure
+RestartSec=60
+StandardOutput=append:/tmp/nano_service.log
+StandardError=append:/tmp/nano_service.log
+
+[Install]
+WantedBy=multi-user.target

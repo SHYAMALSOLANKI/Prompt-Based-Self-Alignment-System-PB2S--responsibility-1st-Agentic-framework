@@ -1,0 +1,14 @@
+# Jetson Nano 2GB SSH Configuration
+# Network: 10.143.230.90
+# Role: Edge Brain / Small Brain
+# SSH enabled via SD card modification
+# PB2S Edge processing ready
+
+# Default user: jetson
+# Default password: jetson (change after first login)
+
+# To connect from laptop:
+# ssh jetson@10.143.230.90
+
+# Device role: Edge monitoring, lightweight AI, real-time response
+# Connected via Cat 6 cable to 8-port switch

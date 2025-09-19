@@ -1,0 +1,3 @@
+# SSH Enable File
+# This file enables SSH on Jetson boot
+# Simply having this file present will enable SSH service
