@@ -8,3 +8,5 @@
 {"timestamp": "2025-09-12T06:23:30", "error": "[WinError 10061] No connection could be made because the target machine actively refused it"}
 {"timestamp": "2025-09-12T06:41:07", "error": "[WinError 10061] No connection could be made because the target machine actively refused it"}
 {"timestamp": "2025-09-12T06:42:09", "error": "[WinError 10061] No connection could be made because the target machine actively refused it"}
+{"timestamp": "2025-09-20T23:20:58", "error": "[Errno 111] Connection refused"}
+{"timestamp": "2025-09-20T23:20:58", "error": "[Errno 111] Connection refused"}
