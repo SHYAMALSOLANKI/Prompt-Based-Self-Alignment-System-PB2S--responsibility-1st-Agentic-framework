@@ -6,8 +6,8 @@ PB2S Dashboard - Streamlit web interface for the PB2S system
 import streamlit as st
 import requests
 import os
-import json
-import base64
+import json      # Used for API response parsing and payloads
+import base64   # Used for encoding/decoding audio data
 from gtts import gTTS
 from io import BytesIO
 
