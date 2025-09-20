@@ -10,3 +10,14 @@
 {"timestamp": "2025-09-12T06:42:09", "error": "[WinError 10061] No connection could be made because the target machine actively refused it"}
 {"timestamp": "2025-09-20T23:20:58", "error": "[Errno 111] Connection refused"}
 {"timestamp": "2025-09-20T23:20:58", "error": "[Errno 111] Connection refused"}
+{"timestamp": "2025-09-20T23:23:11", "error": "[Errno 111] Connection refused"}
+{"timestamp": "2025-09-20T23:23:11", "error": "[Errno 111] Connection refused"}
+{"timestamp": "2025-09-20T23:23:28", "error": "[Errno 111] Connection refused"}
+{"timestamp": "2025-09-20T23:23:28", "error": "[Errno 111] Connection refused"}
+{"timestamp": "2025-09-20T23:23:28", "error": "[Errno 111] Connection refused"}
+{"timestamp": "2025-09-20T23:23:29", "error": "[Errno 111] Connection refused"}
+{"timestamp": "2025-09-20T23:23:29", "error": "[Errno 111] Connection refused"}
+{"timestamp": "2025-09-20T23:23:29", "error": "[Errno 111] Connection refused"}
+{"timestamp": "2025-09-20T23:23:29", "error": "[Errno 111] Connection refused"}
+{"timestamp": "2025-09-20T23:23:29", "error": "[Errno 111] Connection refused"}
+{"timestamp": "2025-09-20T23:25:19", "error": "[Errno 111] Connection refused"}

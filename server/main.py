@@ -175,10 +175,9 @@ def chat(body: ChatIn):
                 draft = f"Quantum entanglement represents a fundamental non-local correlation between particles, where measurement of one instantaneously affects its entangled partner regardless of spatial separation. In the context of {user_query}, this suggests deeper implications for information theory and causality."
                 
                 reflect = (
-                    "Non-locality: Instantaneous correlations transcending spacetime limitations.\n"
-                    "Information Theory: Entanglement as information encoding mechanism.\n"
-                    "Bell's Theorem: Local hidden variables incompatible with quantum predictions.\n"
-                    "Observation: EPR correlations violate classical expectations of locality."
+                    "- contradiction: None apparent in quantum entanglement description\n"
+                    "- unjustified assumption: Local realism assumption challenged by Bell's theorem\n"
+                    "- missing evidence: Need experimental verification of entanglement correlations"
                 )
                 
                 revise = (
@@ -196,10 +195,9 @@ def chat(body: ChatIn):
                 draft = f"Black holes represent extreme gravitational objects where spacetime curvature becomes so intense that the classical description breaks down. Analyzing {user_query} requires consideration of both general relativity and quantum mechanics."
                 
                 reflect = (
-                    "Event Horizon: Boundary beyond which escape velocity exceeds light speed.\n"
-                    "Singularity: Point of infinite curvature where physics laws break down.\n"
-                    "Hawking Radiation: Quantum effects near horizon produce thermal emission.\n"
-                    "Information Paradox: Conflict between quantum unitarity and thermal radiation."
+                    "- contradiction: None in current black hole description\n"
+                    "- unjustified assumption: Singularity existence assumes classical gravity dominance\n"
+                    "- missing evidence: Need quantum gravity theory for complete understanding"
                 )
                 
                 revise = (
@@ -218,10 +216,9 @@ def chat(body: ChatIn):
                 draft = f"Energy conservation combined with mass-energy equivalence E=mc² reveals the fundamental interconnection between matter and energy. Examining {user_query} requires understanding relativistic energy-momentum relationships."
                 
                 reflect = (
-                    "Conservation Principle: Energy remains constant in isolated systems.\n"
-                    "Mass-Energy Equivalence: Rest mass represents concentrated energy.\n"
-                    "Relativistic Effects: Energy includes kinetic and potential components.\n"
-                    "Observation: Nuclear reactions demonstrate mass-energy conversion."
+                    "- contradiction: None apparent in energy conservation statement\n"
+                    "- unjustified assumption: Assuming isolated system conditions\n"
+                    "- missing evidence: Need specific context for energy analysis"
                 )
                 
                 revise = (
@@ -241,10 +238,9 @@ def chat(body: ChatIn):
                 draft = f"Scientific analysis of '{user_query}' requires systematic examination of underlying principles and empirical evidence."
                 
                 reflect = (
-                    "Theoretical Framework: Establish governing physical laws and principles.\n"
-                    "Empirical Evidence: Consider observational data and experimental verification.\n"
-                    "Mathematical Formalism: Apply appropriate mathematical tools and models.\n"
-                    "Boundary Conditions: Identify limits of applicability and approximations."
+                    "- contradiction: None detected in initial analysis\n"
+                    "- unjustified assumption: Assuming complete theoretical framework exists\n"
+                    "- missing evidence: Need empirical validation of theoretical predictions"
                 )
                 
                 revise = (
@@ -263,10 +259,9 @@ def chat(body: ChatIn):
             draft = f"Comprehensive analysis of '{user_query}' requires systematic examination from multiple perspectives."
             
             reflect = (
-                "Contextual Framework: Understanding the broader context and implications.\n"
-                "Multiple Perspectives: Considering various angles and interpretations.\n"
-                "Evidence Assessment: Evaluating available information and sources.\n"
-                "Logical Structure: Ensuring coherent reasoning and valid conclusions."
+                "- contradiction: None apparent in initial understanding\n"
+                "- unjustified assumption: Assuming single perspective is sufficient\n"
+                "- missing evidence: Need multiple sources to validate analysis"
             )
             
             revise = (
