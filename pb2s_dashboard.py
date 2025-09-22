@@ -70,7 +70,6 @@ for node in NODES:
             st.success(f"Great news! {node['name']} is online and ready to chat at {node['url']}.")
         except Exception:
             st.error(f"Oops! {node['name']} at {node['url']} is offline or unreachable. I'll keep checking!")
-        
         # Conversational chat interface
         st.markdown("<b>Say something to your AI friend:</b>", unsafe_allow_html=True)
         prompt = st.text_input(f"What's on your mind? (Ask anything, or just say hi!)", key=node['name'])
