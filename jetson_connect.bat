@@ -1,6 +1,6 @@
 @echo off
 set JETSON_IP=10.224.0.138
-set JETSON_USER=your_jetson_username
+set JETSON_USER=shyamal
 
 echo Checking connectivity to Jetson Orin at %JETSON_IP% ...
 ping -n 4 %JETSON_IP%
