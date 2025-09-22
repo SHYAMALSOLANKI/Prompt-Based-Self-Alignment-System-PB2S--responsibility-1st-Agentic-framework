@@ -1,76 +1,96 @@
-# JETSON RESCUE GUIDE - Get PB2S Running TODAY
+# JETSON RESCUE GUIDE - GET RUNNING TODAY
 
-## STEP 1: Check your current location
+## STEP-BY-STEP JETSON SETUP (NO CODING KNOWLEDGE NEEDED)
+
+### STEP 1: Check Your Current Location
+Open terminal on Jetson and type:
 ```bash
 pwd
+```
+This shows where you are right now.
+
+### STEP 2: Go to Your PB2S_1 Folder
+Based on your screenshots, type exactly this:
+```bash
+cd /home/pb2s_brain/GitHub/PB2S_1
+```
+
+### STEP 3: Check Files Are There
+Type:
+```bash
 ls
 ```
-You should be in: `/home/pb2s_brain/GitHub/PB2S_1/`
+You should see files like: requirements.txt, README.md, server folder, etc.
 
-## STEP 2: Install Python packages directly (no requirements.txt needed)
+### STEP 4: Install Python Packages (THE RIGHT WAY)
+Type exactly this (note the "s" in requirements):
 ```bash
-pip install uvicorn fastapi aiohttp asyncio-mqtt websockets openai scikit-learn opencv-python matplotlib pydantic python-multipart
+pip3 install -r requirements.txt
 ```
 
-## STEP 3: Create a simple PB2S brain server
-Save this as `simple_brain.py` in your PB2S_1 folder:
-
-```python
-from fastapi import FastAPI
-import uvicorn
-import json
-from datetime import datetime
-
-app = FastAPI(title="PB2S Brain Server")
-
-@app.get("/")
-def read_root():
-    return {"message": "PB2S Brain is running!", "status": "active", "time": datetime.now()}
-
-@app.post("/chat")
-def chat_with_brain(message: dict):
-    user_input = message.get("message", "")
-    
-    # Simple PB2S cycle simulation
-    draft = f"DRAFT: Processing '{user_input}'"
-    reflect = f"REFLECT: Checking for contradictions in '{user_input}'"
-    revise = f"REVISE: Refined response for '{user_input}'"
-    learned = f"LEARNED: Stored knowledge about '{user_input}'"
-    
-    response = {
-        "text": f"{draft}\n{reflect}\n{revise}\n{learned}",
-        "pb2s_proof": {
-            "decision": "APPROVE",
-            "cycles": 1,
-            "audit_ref": f"run-{datetime.now().timestamp()}"
-        }
-    }
-    
-    return response
-
-@app.get("/health")
-def health_check():
-    return {"status": "healthy", "brain": "active"}
-
-if __name__ == "__main__":
-    print("Starting PB2S Brain Server...")
-    uvicorn.run(app, host="0.0.0.0", port=8000)
-```
-
-## STEP 4: Run the brain server
+### STEP 5: If Step 4 Fails, Install Individual Packages
+Type these one by one:
 ```bash
-python3 simple_brain.py
+pip3 install fastapi
+pip3 install uvicorn
+pip3 install aiohttp
+pip3 install asyncio-mqtt
+pip3 install websockets
+pip3 install openai
+pip3 install scikit-learn
+pip3 install opencv-python
+pip3 install matplotlib
+pip3 install numpy
+pip3 install pandas
 ```
 
-## STEP 5: Test from another terminal or your laptop
+### STEP 6: Start the PB2S Server
+Type:
 ```bash
-curl -X POST http://10.224.0.138:8000/chat -H "Content-Type: application/json" -d '{"message": "Hello PB2S brain!"}'
+python3 -c "import uvicorn; uvicorn.run('server.main:app', host='0.0.0.0', port=8000)"
 ```
 
-## STEP 6: Add LLM capability (optional - after basic works)
-Install LLM packages:
+### STEP 7: Test From Your Laptop
+Open Command Prompt on your laptop and type:
 ```bash
-pip install transformers torch
+curl -X POST http://10.224.0.138:8000/chat -H "Content-Type: application/json" -d "{\"message\": \"Hello PB2S brain!\"}"
 ```
 
-That's it! Your PB2S brain will be running on port 8000.
+## IF ANYTHING FAILS:
+
+### Problem: "No such file or directory"
+- Make sure you're in the right folder: `/home/pb2s_brain/GitHub/PB2S_1`
+- Check the folder exists: `ls /home/pb2s_brain/GitHub/`
+
+### Problem: "Permission denied"
+- Add `sudo` before the command: `sudo pip3 install -r requirements.txt`
+
+### Problem: "Module not found"
+- Install packages individually (see Step 5 above)
+
+### Problem: "Port already in use"
+- Kill existing processes: `sudo pkill -f uvicorn`
+- Try again
+
+## EMERGENCY BACKUP PLAN
+
+If nothing works, create a simple test:
+
+1. Create a test file:
+```bash
+echo 'print("Jetson is working!")' > test.py
+```
+
+2. Run it:
+```bash
+python3 test.py
+```
+
+If this works, Python is fine and we can debug the PB2S installation.
+
+## CONTACT POINTS
+- IP Address: 10.224.0.138
+- Username: shyamal
+- Main Folder: /home/pb2s_brain/GitHub/PB2S_1
+
+You WILL get this working today. Follow these steps exactly and let me know where you get stuck.
