@@ -28,7 +28,6 @@ This manifest affirms PB2S’s commitment to recursive equality, self-safety, an
 
 [![PB2S Conformance](https://github.com/SHYAMALSOLANKI/Prompt-Based-Self-Alignment-System-PB2S--responsibility-1st-Agentic-framework/actions/workflows/main.yml/badge.svg)](../../actions/workflows/main.yml)
 
-
 ### PB2S Conformance & Evidence
 
 - ✅ **PB2S v0.2.1 structure** implemented (DRAFT → REFLECT → REVISE → LEARNED)  following SPECIFICATION/PB2S_v0.2.1_spec_mandate.md with `pb2s_proof`.
