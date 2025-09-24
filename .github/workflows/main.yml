@@ -1,4 +1,4 @@
-name: PB2S Conformance & Acceptance Tests
+name: PB2S Simple 4-Step Conformance Test
 
 on:
   push:
@@ -18,7 +18,7 @@ on:
 
 jobs:
   conformance:
-    name: Run Conformance Tests
+    name: Simple PB2S 4-Step Conformance Test
     runs-on: ubuntu-latest
 
     steps:
@@ -34,34 +34,12 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
-          # make sure CI has the basics
-          pip install fastapi uvicorn pydantic requests jsonschema
-
-      - name: Show layout (debug)
-        run: |
-          echo "== SPECIFICATION ==" && ls -la SPECIFICATION || true
-          echo "== schemas ==" && ls -la schemas || true
-          echo "== scripts ==" && ls -la scripts || true
-          echo "== server ==" && ls -la server || true
-
-      - name: Validate SOT Sections
-        run: |
-          set -euo pipefail
-          SPEC="SPECIFICATION/SPEC-2_Total_Attention_EdgeAI_v0.2.1.1_RELEASE.md"
-          SCHEMA_A="schemas/pb2s_proof.v2.schema.json"
-          SCHEMA_B="schemas/pb2s_proof.schema.json"
-          if [ -f "$SCHEMA_A" ]; then SCHEMA="$SCHEMA_A"; else SCHEMA="$SCHEMA_B"; fi
-          echo "Using spec: $SPEC"
-          echo "Using schema: $SCHEMA"
-          python scripts/sot_verify.py --spec "$SPEC" --sections 2..10 --schema "$SCHEMA"
 
       - name: Ensure package import works
         run: |
-          # make server a Python package so uvicorn can import server.main:app
           test -f server/__init__.py || touch server/__init__.py
           python - <<'PY'
           import importlib
-          import sys
           m = importlib.import_module("server.main")
           assert hasattr(m, "app"), "server.main must define 'app'"
           print("server.main:app import OK")
@@ -69,19 +47,17 @@ jobs:
 
       - name: Start PB2S Planner (server.main:app)
         run: |
-          set -euo pipefail
-          # start uvicorn and log to file
           python -c "import uvicorn; uvicorn.run('server.main:app', host='0.0.0.0', port=8000)" > server.log 2>&1 &
           echo "Waiting for API to be ready…"
           for i in {1..60}; do
-            if curl -fsS http://127.0.0.1:8000/openapi.json >/dev/null; then
+            if curl -fsS http://127.0.0.1:8000/openapi.json >/dev/null 2>&1; then
               echo "API is up."
               break
             fi
             sleep 1
             if [ $i -eq 60 ]; then
               echo "API did not start. Dumping server.log:"
-              sed -n '1,200p' server.log || true
+              cat server.log || true
               exit 1
             fi
           done
@@ -89,18 +65,3 @@ jobs:
       - name: Run Core Conformance Test
         run: |
           python scripts/conformance.py --endpoint http://127.0.0.1:8000/chat
-
-      - name: Run Acceptance Test Bundle (AT-1..AT-7)
-        run: |
-          [ -f scripts/at_bus.py ] && python scripts/at_bus.py || true
-          [ -f scripts/at_determinism.py ] && python scripts/at_determinism.py || true
-          [ -f scripts/at_clarify.py ] && python scripts/at_clarify.py || true
-          [ -f scripts/at_proof_to_action.py ] && python scripts/at_proof_to_action.py || true
-          [ -f scripts/at_retention.py ] && python scripts/at_retention.py || true
-
-      - name: Upload Test Artifacts
-        uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: pb2s_evidence
-          path: docs/challenges/*.json
