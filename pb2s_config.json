@@ -1,0 +1,73 @@
+{
+  "pb2s_framework": {
+    "version": "0.2",
+    "core_loop": {
+      "draft": {
+        "function": "initial_response_generation",
+        "constraints": ["concise", "direct", "no_filler"]
+      },
+      "reflect": {
+        "function": "contradiction_detection",
+        "max_bullets": 3,
+        "check_types": ["contradictions", "assumptions", "edge_cases"]
+      },
+      "revise": {
+        "function": "conflict_resolution",
+        "sentence_range": [3, 8]
+      },
+      "learned": {
+        "function": "rule_extraction", 
+        "format": "one_line_rule"
+      }
+    },
+    "sal_system": {
+      "tags": ["Definition", "Claim", "Evidence", "Contradiction", "Ambiguity", "Task"],
+      "display": false
+    },
+    "irq_queue": {
+      "format": "[{timestamp}] SRC: {context} RULE: {rule}",
+      "persistence": true,
+      "persistence_file": "pb2s_irq_queue.log"
+    },
+    "compliance": {
+      "temperature_max": 0.2,
+      "max_cycles": 2,
+      "trace_logging": true,
+      "proof_object_required": true
+    }
+  },
+  "server_config": {
+    "title": "PB2S v0.2 Framework Server",
+    "version": "0.2.0",
+    "rate_limit": 10,
+    "trace_log": "pb2s_trace.log",
+    "mqtt_enabled": true,
+    "content_moderation": true
+  },
+  "examples": {
+    "test_prompts": [
+      {
+        "id": "p1",
+        "message": "Explain the purpose of the four-step self-audit structure in one paragraph.",
+        "expected_reflect_keywords": ["contradiction", "unjustified assumption", "missing evidence"]
+      },
+      {
+        "id": "p2", 
+        "message": "Summarize the main causes of the French Revolution in 3-4 sentences.",
+        "expected_reflect_keywords": ["contradiction", "unjustified assumption", "missing evidence"]
+      },
+      {
+        "id": "p3",
+        "message": "What is the relationship between quantum entanglement and information theory?",
+        "expected_reflect_keywords": ["contradiction", "unjustified assumption", "missing evidence"]
+      }
+    ]
+  },
+  "validation": {
+    "conformance_endpoint": "http://127.0.0.1:8000/chat",
+    "schema_path": "schemas/pb2s_proof.schema.json",
+    "expected_sections": ["DRAFT", "REFLECT", "REVISE", "LEARNED"],
+    "reflect_max_bullets": 3,
+    "reflect_required_keywords": ["contradiction", "unjustified assumption", "missing evidence"]
+  }
+}
