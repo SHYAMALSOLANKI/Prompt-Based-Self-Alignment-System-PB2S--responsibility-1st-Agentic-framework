@@ -4,6 +4,101 @@ Always reference these instructions first and fallback to search or bash command
 
 ## Working Effectively
 
+##core mandatory instruction:
+---
+mode: agent
+---
+Define the task to achieve, including specific requirements, constraints, and success criteria.
+# PB2S Agent/co-pilot Mandatory Conformance Instructions
+
+## Objective
+Every agent interacting with the PB2S system **must**:
+- Complete the defined 4-step cycle **three consecutive times (total: 12 steps)**.
+- For each cycle, produce and submit a **system-generated artifact** (not chat simulation) as proof of completion and adherence to the structure.
+
+## The 4-Step Cycle
+1. **Step 1: Perception**
+   - Agent collects and documents relevant input or environmental data.
+   - System logs must capture this event.
+
+2. **Step 2: Analysis**
+   - Agent critically examines the input for contradiction, assumption, or missing evidence.
+   - System produces a structured analysis record.
+
+3. **Step 3: Reflection**
+   - Agent flags findings and recommends corrective or clarifying action.
+   - Reflection must be logged with explicit flag(s).
+
+4. **Step 4: Action**
+   - Agent implements or proposes an actionable step based on reflection.
+   - Action is logged and traceable in system artifact.
+
+## Cycle Repetition
+- The agent must repeat the 4-step cycle **three times** (total: 12 steps).
+- Each cycle must be independently logged.
+
+## Proof of Structure
+- Upon completion, the agent must submit **system-generated artifacts** (e.g., JSON, log files, database entry) for each cycle.
+- Artifacts MUST include:
+  - Timestamps for each step.
+  - Data/decisions made at each step.
+  - Evidence of flagging and actions taken.
+- **No simulation or conversational output alone is accepted.**
+- Artifacts must be accessible for audit and verification by external parties.
+
+## Enforcement
+- Any agent failing to provide valid, system-generated artifacts for all three cycles will be considered **non-conformant**.
+- The PB2S system will reject any simulation-only output and require artifact submission before accepting cycle completion.
+
+---
+
+## Example Artifact Structure (JSON)
+
+```json
+{
+  "cycle_number": 1,
+  "steps": [
+    {
+      "step": "Perception",
+      "timestamp": "2025-09-25T01:32:18Z",
+      "input": "Input data collected",
+      "artifact_id": "abc123"
+    },
+    {
+      "step": "Analysis",
+      "timestamp": "2025-09-25T01:33:00Z",
+      "contradictions_found": false,
+      "assumptions_found": true,
+      "missing_evidence": true,
+      "artifact_id": "abc124"
+    },
+    {
+      "step": "Reflection",
+      "timestamp": "2025-09-25T01:33:30Z",
+      "flags": ["assumption", "missing_evidence"],
+      "recommendation": "Clarify assumption and seek evidence",
+      "artifact_id": "abc125"
+    },
+    {
+      "step": "Action",
+      "timestamp": "2025-09-25T01:34:00Z",
+      "action_taken": "Requested supporting documents",
+      "artifact_id": "abc126"
+    }
+  ]
+}
+```
+
+---
+
+## Summary
+**Any agent must:**  
+- Perform the 4-step PB2S cycle three times.  
+- Provide system-generated artifacts for each step/cycle.
+- Artifacts must be accessible and verifiable.
+- Simulation/chat-only submissions are rejected.
+
+
 ### Environment Setup
 - Use Python 3.12+ (validated working version)
 - Create virtual environment: `python -m venv .venv`
