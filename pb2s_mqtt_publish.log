@@ -28,3 +28,6 @@
 {"timestamp": "2025-09-24T19:32:29", "error": "[Errno 111] Connection refused"}
 {"timestamp": "2025-09-25T02:25:57", "error": "[Errno 111] Connection refused"}
 {"timestamp": "2025-09-25T02:25:57", "error": "[Errno 111] Connection refused"}
+{"timestamp": "2025-09-25T02:26:57", "error": "[Errno 111] Connection refused"}
+{"timestamp": "2025-09-25T02:34:49", "error": "[Errno 111] Connection refused"}
+{"timestamp": "2025-09-25T02:34:49", "error": "[Errno 111] Connection refused"}
