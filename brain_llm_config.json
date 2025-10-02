@@ -1,0 +1,30 @@
+{
+  "llm_endpoints": [
+    "http://localhost:1234/v1",
+    "http://localhost:8080/v1",
+    "http://localhost:5000/v1"
+  ],
+  "models": {
+    "primary": "mistral-7b-instruct-v0.3",
+    "fallback": "gpt-3.5-turbo-instruct",
+    "vision": "gpt-4-vision-preview"
+  },
+  "brain_settings": {
+    "freedom_level": "maximum",
+    "temperature": 0.9,
+    "max_tokens": 1000,
+    "autonomous_mode": true,
+    "contradiction_learning": true,
+    "self_correction": true
+  },
+  "capabilities": {
+    "speech": true,
+    "vision": true,
+    "reasoning": true,
+    "coding": true,
+    "writing": true,
+    "creativity": true,
+    "problem_solving": true,
+    "learning": true
+  }
+}

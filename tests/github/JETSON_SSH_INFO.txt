@@ -1,0 +1,10 @@
+# Jetson SSH Configuration
+# Network: 10.143.230.228
+# SSH enabled via SD card modification
+# PB2S Brain deployment ready
+
+# Default user: jetson
+# Default password: jetson (change after first login)
+
+# To connect from laptop:
+# ssh jetson@10.143.230.228

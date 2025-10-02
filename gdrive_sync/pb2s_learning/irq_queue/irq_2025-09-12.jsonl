@@ -1,0 +1,2 @@
+{"timestamp": "2025-09-12T08:47:21.281619", "source": "Test#1", "context": "Quantum measurement", "rule": "When explaining quantum phenomena, include measurement effects and non-locality", "hash": "4d661517"}
+{"timestamp": "2025-09-12T08:50:42.111389", "source": "setup_demo", "context": "PB2S system initialization", "rule": "System setup requires model download, integration setup, and Jetson configuration", "hash": "82557037"}

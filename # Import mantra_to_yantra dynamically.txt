@@ -1,0 +1,7 @@
+# Import mantra_to_yantra dynamically
+spec = importlib.util.spec_from_file_location(
+    "mantra_to_yantra", 
+    "mantra_to_yantra/mantra_to_yantra.py"
+)
+mantra_yantra = importlib.util.module_from_spec(spec)
+spec.loader.exec_module(mantra_yantra)

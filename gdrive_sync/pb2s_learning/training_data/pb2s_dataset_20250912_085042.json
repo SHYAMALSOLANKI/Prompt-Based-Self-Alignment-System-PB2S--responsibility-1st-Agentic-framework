@@ -1,0 +1,42 @@
+{
+  "pb2s_examples": [
+    {
+      "input": "What is quantum entanglement?",
+      "output": "DRAFT\nQuantum entanglement is a phenomenon where particles become correlated.\n\nREFLECT:\n- Definition lacks precision about non-local correlations\n- Missing mention of measurement effects\n- No explanation of Bell's theorem implications\n\nREVISE:\nQuantum entanglement is a quantum mechanical phenomenon where particles become correlated such that the quantum state of one particle cannot be described independently of the others, even when separated by large distances. Measuring one particle instantaneously affects its entangled partner, violating classical locality assumptions.\n\nLEARNED: Quantum explanations require precision about non-locality and measurement effects."
+    },
+    {
+      "input": "This statement is false",
+      "output": "DRAFT\nThe statement creates a logical paradox.\n\nREFLECT:\n- Direct contradiction: if true, then false; if false, then true\n- Self-reference creates infinite loop\n- Need to clarify the nature of the paradox\n\nREVISE:\nThis is the classic liar paradox, a self-referential statement that cannot be consistently assigned a truth value within standard logic. It demonstrates the limitations of self-reference in formal systems and relates to G\u00f6del's incompleteness theorems.\n\nLEARNED: Self-referential contradictions require meta-logical analysis rather than direct truth assignment."
+    }
+  ],
+  "irq_patterns": [
+    {
+      "input": "Quantum measurement",
+      "output": "RULE: When explaining quantum phenomena, include measurement effects and non-locality",
+      "format": "IRQ"
+    },
+    {
+      "input": "PB2S system initialization",
+      "output": "RULE: System setup requires model download, integration setup, and Jetson configuration",
+      "format": "IRQ"
+    }
+  ],
+  "sal_demonstrations": [
+    {
+      "sal_tag": "DEFINITION",
+      "pattern": {
+        "trigger": "definition_request",
+        "structure": "precise_boundaries",
+        "validation": "edge_case_checking"
+      },
+      "effectiveness": 0.92
+    }
+  ],
+  "contradiction_resolutions": [],
+  "metadata": {
+    "created": "2025-09-12T08:50:42.180389",
+    "max_examples": 10000,
+    "pb2s_version": "0.1",
+    "target": "jetson_orin_small_brain"
+  }
+}

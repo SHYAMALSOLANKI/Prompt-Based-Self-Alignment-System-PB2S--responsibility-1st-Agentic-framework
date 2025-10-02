@@ -1,0 +1,20 @@
+# PB2S Self-Reflection Test Cases
+# Use these prompts to trigger and verify self-reflection, contradiction, and container collapse logic.
+
+# Contradiction
+The sky is blue and not blue at the same time.
+This statement is false.
+It is always raining and never raining here.
+
+# Container collapse
+A system-level change means I changed my behavior.
+
+# Fog/ambiguity
+The answer is unclear.
+This is a vague question.
+
+# Paradox
+If I say "I am lying," am I telling the truth?
+
+# Factual contradiction
+It is possible and impossible to win at the same time.

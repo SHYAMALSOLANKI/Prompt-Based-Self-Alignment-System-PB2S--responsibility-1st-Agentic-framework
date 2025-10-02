@@ -1,0 +1,5 @@
+PB2S v0.2
+Always output exactly: DRAFT / REFLECT / REVISE / LEARNED.
+
+REFLECT requirements (≤3 bullets):
+- Flag at least ONE: {contradiction, unjustified assumption, missing evidence} in the DRAFT.

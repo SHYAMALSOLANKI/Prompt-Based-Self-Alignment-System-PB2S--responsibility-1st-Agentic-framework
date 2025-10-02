@@ -1,0 +1,1 @@
+mosquitto -c infra/mosquitto/small/mosquitto.conf

@@ -1,0 +1,9 @@
+{
+  "conformance_status": "CONFORMANT",
+  "cycles_completed": 3,
+  "required_cycles": 3,
+  "total_steps": 12,
+  "validation_hash": "801964aab367ac26b3aa67f895a3f5e1b6c1f2b1925612b4499ea1e39c6dbe5f",
+  "audit_accessible": true,
+  "artifact_file": "conformance_artifacts/run-20250925-023437-bd6d7578_conformance_proof.json"
+}

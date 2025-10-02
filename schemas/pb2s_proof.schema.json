@@ -1,0 +1,12 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.org/schemas/pb2s_proof.schema.json",
+  "type": "object",
+  "required": ["decision", "cycles", "audit_ref"],
+  "properties": {
+    "decision": {"enum": ["APPROVE", "CLARIFY"]},
+    "cycles": {"type": "integer", "minimum": 0, "maximum": 2},
+    "audit_ref": {"type": "string", "minLength": 1}
+  },
+  "additionalProperties": true
+}

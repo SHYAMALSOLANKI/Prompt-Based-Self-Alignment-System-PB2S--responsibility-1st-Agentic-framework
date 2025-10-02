@@ -1,0 +1,12 @@
+{
+  "timestamp": "2025-09-12T08:47:21.388378",
+  "sal_tag": "Definition",
+  "pattern": {
+    "trigger": "definition_request",
+    "structure": "precise_boundaries",
+    "validation": "edge_case_checking"
+  },
+  "effectiveness": 0.92,
+  "usage_frequency": 0,
+  "hash": "b9f4263e"
+}

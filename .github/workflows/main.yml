@@ -1,0 +1,67 @@
+name: PB2S Simple 4-Step Conformance Test
+
+on:
+  push:
+    paths:
+      - 'SPECIFICATION/**'
+      - 'schemas/**'
+      - 'scripts/**'
+      - 'server/**'
+      - '.github/workflows/**'
+  pull_request:
+    paths:
+      - 'SPECIFICATION/**'
+      - 'schemas/**'
+      - 'scripts/**'
+      - 'server/**'
+      - '.github/workflows/**'
+
+jobs:
+  conformance:
+    name: Simple PB2S 4-Step Conformance Test
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+
+      - name: Ensure package import works
+        run: |
+          test -f server/__init__.py || touch server/__init__.py
+          python - <<'PY'
+          import importlib
+          m = importlib.import_module("server.main")
+          assert hasattr(m, "app"), "server.main must define 'app'"
+          print("server.main:app import OK")
+          PY
+
+      - name: Start PB2S Planner (server.main:app)
+        run: |
+          python -c "import uvicorn; uvicorn.run('server.main:app', host='0.0.0.0', port=8000)" > server.log 2>&1 &
+          echo "Waiting for API to be ready…"
+          for i in {1..60}; do
+            if curl -fsS http://127.0.0.1:8000/openapi.json >/dev/null 2>&1; then
+              echo "API is up."
+              break
+            fi
+            sleep 1
+            if [ $i -eq 60 ]; then
+              echo "API did not start. Dumping server.log:"
+              cat server.log || true
+              exit 1
+            fi
+          done
+
+      - name: Run Core Conformance Test
+        run: |
+          python scripts/conformance.py --endpoint http://127.0.0.1:8000/chat

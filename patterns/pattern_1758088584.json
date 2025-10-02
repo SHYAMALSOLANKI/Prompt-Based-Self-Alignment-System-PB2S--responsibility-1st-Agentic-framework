@@ -1,0 +1,1 @@
+{"type": "concept", "value": "Use a more robust PDF generation method that avoids truncation by writing line-by-line,", "source": "pb2s_knowledge\\equality_chat_log.md"}
