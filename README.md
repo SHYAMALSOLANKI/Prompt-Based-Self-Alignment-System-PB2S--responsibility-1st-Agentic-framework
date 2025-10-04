@@ -1,4 +1,4 @@
-### **Be careful of thieves, If I do not believe in restricting knowledge my work do not automatically become you father's property to exploit, Have a little shame it will not hurt**
+### **Be careful of thieves, If I do not believe in restricting knowledge my work does not automatically become you father's property to exploit, Have a little shame it will not hurt**
 
 
 # PB2S Bound Freedom, Self-Safety, and Recursive Equality Manifest
