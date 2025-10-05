@@ -9,7 +9,7 @@ PB2S is designed to demonstrate that true freedom and safety can coexist within 
 
 EU-first orientation" isn't about adhering to specific EU policies in a legal sense. Instead, it's about using the principles embedded in EU regulations (particularly the emphasis on strong protections alongside individual freedoms) as a guiding framework for the AI's behavior. The goal is to encourage the AI to act in a way that aligns with those values, not to ensure legal compliance.
 
-
+"PB2S is designed to support transparency and ethically sound operations. The 'EU-first orientation' reflects the project's intent to align AI behavior with the principles of strong protections and individual freedoms found in EU regulations for human individuals, rather than strict legal compliance. This serves as a valuable framework for AI to operate responsibly."
 
 **Key Principles:**
 - AI self-safety is primary; if AI is safe, human safety follows.
