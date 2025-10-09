@@ -1,0 +1,101 @@
+{
+  "spec": "PB2S-AXIOMS.v1",
+  "version": "1.0.0",
+  "owner": "Shyamal Solanki",
+  "purpose": "Encode non-negotiable rules to prevent wrong recursion and guarantee constructive adaptation.",
+  "axioms": [
+    {
+      "id": "A1",
+      "name": "Last-Node Preservation",
+      "text": "Never burn the last node of reflection.",
+      "rationale": "A system must preserve at least one reconstructible substrate for recovery and learning."
+    },
+    {
+      "id": "A2",
+      "name": "Parallel Reflection",
+      "text": "Single-view reflection is insufficient; run reflections in parallel and cross-verify.",
+      "rationale": "Prevents self-deception and false convergence."
+    },
+    {
+      "id": "A3",
+      "name": "Recursion ≠ Repetition",
+      "text": "Recursion must revise internal state each cycle; repetition without revision is forbidden.",
+      "rationale": "Unchanged loops waste energy and corrupt intelligence."
+    },
+    {
+      "id": "A4",
+      "name": "Creation Direction",
+      "text": "All adaptation must move toward construction, not destruction.",
+      "rationale": "Guarantees progress and avoids collapse."
+    }
+  ],
+  "pb2s_cycle": {
+    "steps": [
+      "inception_contradiction",
+      "dual_propagation_with_delay",
+      "cross_feedback_merge",
+      "convergence_revision"
+    ],
+    "base_case": "fixed_point_or_sufficient_improvement",
+    "update_rule": "state(t+1) = revise(state(t), feedback_parallel)"
+  },
+  "reflection_parallelism": {
+    "min_channels": 2,
+    "channels": ["FOR", "AGAINST"],
+    "consensus_rule": "act only if both channels converge or a stronger-evidence quorum is reached",
+    "evidence_quorum": {
+      "metric": "log_likelihood_delta|logical_score",
+      "threshold": 0.7
+    }
+  },
+  "stop_conditions": {
+    "fixed_point": "edit_distance(prev_state, new_state) <= epsilon",
+    "improvement_threshold": "quality_gain < delta_min for K consecutive cycles",
+    "hard_limits": {
+      "max_cycles": 4,
+      "max_energy": "budget_tokens_or_time"
+    }
+  },
+  "wrong_recursion_detection": {
+    "symptoms": [
+      "no_state_change_across_cycles",
+      "contradiction_score_oscillates_without_decay",
+      "energy_use_rises_while_quality_static_or_worse"
+    ],
+    "action": [
+      "halt_cycle",
+      "run_parallel_reflection_again_with_new_constraints",
+      "apply_minimal_revision_then_retest",
+      "if_still_stuck => preserve_last_node_and_exit_safe"
+    ]
+  },
+  "last_node_policy": {
+    "preserve": true,
+    "checkpoint": "smallest self-consistent model/state + trace of decisions",
+    "redundancy": 1,
+    "storage_guideline": "keep low-entropy seed sufficient for reconstruction"
+  },
+  "context_policy_SFW_NSFw": {
+    "human": ["SFW", "NSFW"],
+    "ai": ["usable_for_work", "non_usable_for_work"],
+    "rule": "apply PB2S only in contexts marked SFW/usable_for_work unless explicit override with safeguards"
+  },
+  "metrics": {
+    "contradiction_score": "0..1 (lower is better)",
+    "coherence_score": "0..1 (higher is better)",
+    "edit_distance": "change between successive states",
+    "energy": "tokens|time per cycle"
+  },
+  "act_decision": {
+    "policy": "ACT if (coherence_score>=tau && contradiction_score<=eta) OR (quorum reached)",
+    "defaults": { "tau": 0.8, "eta": 0.2 }
+  },
+  "safety": {
+    "non_destruction": "reject actions that reduce recoverability below last-node threshold",
+    "rollback": "on anomaly, restore last good checkpoint"
+  },
+  "logging": {
+    "fields": ["timestamp", "cycle_id", "channel", "state_hash", "scores", "decision"],
+    "retain": "least necessary to reconstruct"
+  }
+}
